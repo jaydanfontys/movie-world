@@ -5,13 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <title>World of Entertainment</title>
-<link rel="stylesheet" href="stylesheet/style.css" />
-<link rel="stylesheet" href="stylesheet/hub-world.css" />
-<link rel="stylesheet" href="stylesheet/movie-world.css" />
-<link rel="stylesheet" href="stylesheet/tv-world.css" />
-<link rel="stylesheet" href="stylesheet/music-world.css" />
-<link rel="stylesheet" href="stylesheet/game-world.css" />
-<link rel="stylesheet" href="stylesheet/anime-world.css" />
+
+  <link rel="stylesheet" href="stylesheet/style.css" />
+  <link rel="stylesheet" href="stylesheet/hub-world.css" />
+  <link rel="stylesheet" href="stylesheet/movie-world.css" />
+  <link rel="stylesheet" href="stylesheet/tv-world.css" />
+  <link rel="stylesheet" href="stylesheet/music-world.css" />
+  <link rel="stylesheet" href="stylesheet/game-world.css" />
+  <link rel="stylesheet" href="stylesheet/anime-world.css" />
 
   <script type="importmap">
     {
@@ -24,34 +25,85 @@
 </head>
 
 <body>
+  <!-- ===============================
+       START SCREEN
+       =============================== -->
   <div id="startScreen">
     <h1>World of Entertainment</h1>
+
     <p>
       Choose your car, start from the central hub, and drive to different entertainment worlds.
       Discover movies, TV shows, music videos, games, and anime.
     </p>
 
+    <!-- Car selection -->
     <div id="carSelection">
-      <h2>Choose Your Car</h2>
+      <h2>Choose Your Ride</h2>
 
-      <div class="carOptions">
-        <button class="carColor selected" data-color="#d62828" style="background:#d62828;"></button>
-        <button class="carColor" data-color="#1d4ed8" style="background:#1d4ed8;"></button>
-        <button class="carColor" data-color="#16a34a" style="background:#16a34a;"></button>
-        <button class="carColor" data-color="#facc15" style="background:#facc15;"></button>
-        <button class="carColor" data-color="#ffffff" style="background:#ffffff;"></button>
-        <button class="carColor" data-color="#111111" style="background:#111111;"></button>
+      <div class="carModelOptions">
+        <button class="carModelCard selected" data-car="redBlock">
+          <span class="carIcon">🚗</span>
+          <strong>Red Block Car</strong>
+          <small>Best for testing</small>
+        </button>
+
+        <button class="carModelCard" data-car="blueBlock">
+          <span class="carIcon">🚙</span>
+          <strong>Blue Block Car</strong>
+          <small>Phone friendly</small>
+        </button>
+
+        <button class="carModelCard" data-car="blackBlock">
+          <span class="carIcon">🚘</span>
+          <strong>Black Block Car</strong>
+          <small>Simple version</small>
+        </button>
+
+        <button class="carModelCard" data-car="challenger">
+          <span class="carIcon">🏎️</span>
+          <strong>Dodge Challenger</strong>
+          <small>3D model</small>
+        </button>
+
+        <button class="carModelCard" data-car="charger">
+          <span class="carIcon">🏁</span>
+          <strong>Dodge Charger</strong>
+          <small>3D model</small>
+        </button>
+
+        <button class="carModelCard locked" data-car="comingSoon1" disabled>
+          <span class="carIcon">🔒</span>
+          <strong>More Cars</strong>
+          <small>Coming soon</small>
+        </button>
       </div>
     </div>
 
     <button id="startBtn">Start Exploring</button>
   </div>
 
+  <!-- ===============================
+       HUD
+       =============================== -->
   <div id="hud">
     <h2 id="currentGenre">Central Entertainment Hub</h2>
     <p>Use W A S D or Arrow Keys to drive. Go near a station to open its panel.</p>
   </div>
 
+  <!-- ===============================
+       MOBILE CONTROLS
+       =============================== -->
+  <div id="mobileControls">
+    <div id="joystick">
+      <div id="joystickKnob"></div>
+    </div>
+
+    <button id="mobileBrake">Brake</button>
+  </div>
+
+  <!-- ===============================
+       MOVIE PANEL
+       =============================== -->
   <div id="moviePanel" class="hidden">
     <button id="closePanel">×</button>
     <h2 id="panelTitle">Genre</h2>
@@ -67,6 +119,9 @@
     </div>
   </div>
 
+  <!-- ===============================
+       TV PANEL
+       =============================== -->
   <div id="tvPanel" class="hidden">
     <button id="closeTvPanel">×</button>
     <h2 id="tvPanelTitle">TV Genre</h2>
@@ -82,6 +137,9 @@
     </div>
   </div>
 
+  <!-- ===============================
+       MUSIC PANEL
+       =============================== -->
   <div id="musicPanel" class="hidden">
     <button id="closeMusicPanel">×</button>
     <h2 id="musicPanelTitle">Music Genre</h2>
@@ -97,6 +155,9 @@
     </div>
   </div>
 
+  <!-- ===============================
+       GAME PANEL
+       =============================== -->
   <div id="gamePanel" class="hidden">
     <button id="closeGamePanel">×</button>
     <h2 id="gamePanelTitle">Game Genre</h2>
@@ -112,6 +173,9 @@
     </div>
   </div>
 
+  <!-- ===============================
+       ANIME PANEL
+       =============================== -->
   <div id="animePanel" class="hidden">
     <button id="closeAnimePanel">×</button>
     <h2 id="animePanelTitle">Anime Genre</h2>
@@ -127,6 +191,7 @@
     </div>
   </div>
 
+  <!-- Three.js canvas -->
   <canvas id="world"></canvas>
 
   <script type="module" src="js/three.js"></script>

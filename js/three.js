@@ -89,6 +89,11 @@ const animeTrailerFrame = document.querySelector("#animeTrailerFrame");
 // HUD text
 const currentGenreText = document.querySelector("#currentGenre");
 
+// Mobile controls
+const joystick = document.querySelector("#joystick");
+const joystickKnob = document.querySelector("#joystickKnob");
+const mobileBrake = document.querySelector("#mobileBrake");
+
 // ===============================
 // 3. GAME VARIABLES
 // ===============================
@@ -100,10 +105,62 @@ let rotationSpeed = 0;
 let currentStation = null;
 let gameStarted = false;
 
-let selectedCarColor = "#d62828";
-let carBodyMaterial;
+// Mobile joystick values
+let joystickForward = 0;
+let joystickTurn = 0;
+let mobileBrakePressed = false;
 
-const carColorButtons = document.querySelectorAll(".carColor");
+// The car is now a group that holds the selected car.
+let car = null;
+let activeCarModel = null;
+
+// These buttons come from the car selection cards in index.html.
+const carModelButtons = document.querySelectorAll(".carModelCard");
+
+// This car system supports both simple block cars and 3D model cars.
+// For user testing, the block cars are safer on phones.
+const CAR_OPTIONS = {
+  redBlock: {
+    name: "Red Block Car",
+    type: "basic",
+    color: "#d62828"
+  },
+
+  blueBlock: {
+    name: "Blue Block Car",
+    type: "basic",
+    color: "#1d4ed8"
+  },
+
+  blackBlock: {
+    name: "Black Block Car",
+    type: "basic",
+    color: "#111111"
+  },
+
+  challenger: {
+    name: "Dodge Challenger",
+    type: "model",
+    path: "models/dodge_challenger.glb",
+    targetLength: 5.2,
+
+    // Change this to Math.PI if the car faces backwards.
+    rotationY: 0
+  },
+
+  charger: {
+    name: "Dodge Charger",
+    type: "model",
+    path: "models/dodge_charger.glb",
+    targetLength: 5.2,
+
+    // Change this to Math.PI if the car faces backwards.
+    rotationY: 0
+  }
+};
+
+// Default car for user testing.
+let selectedCarKey = "redBlock";
 
 // ===============================
 // 4. WORLD POSITIONS
@@ -140,22 +197,27 @@ const BRIDGE_CONNECTIONS = [
 ];
 
 // ===============================
-// 5. CAR COLOR SELECTION
+// 5. CAR SELECTION
 // ===============================
 
-carColorButtons.forEach((button) => {
+carModelButtons.forEach((button) => {
   button.addEventListener("click", () => {
-    selectedCarColor = button.dataset.color;
+    const carKey = button.dataset.car;
 
-    carColorButtons.forEach((btn) => {
+    // If the button is for a coming soon car, do nothing.
+    if (!CAR_OPTIONS[carKey]) return;
+
+    selectedCarKey = carKey;
+
+    carModelButtons.forEach((btn) => {
       btn.classList.remove("selected");
     });
 
     button.classList.add("selected");
 
-    // If the car already exists, change its color live.
-    if (carBodyMaterial) {
-      carBodyMaterial.color.set(selectedCarColor);
+    // If the car already exists in the world, replace it live.
+    if (car) {
+      loadSelectedCar();
     }
   });
 });
@@ -205,7 +267,93 @@ window.addEventListener("keyup", (event) => {
 });
 
 // ===============================
-// 7. LIGHTING
+// 7. MOBILE JOYSTICK CONTROLS
+// ===============================
+
+let joystickActive = false;
+let joystickCenterX = 0;
+let joystickCenterY = 0;
+const joystickMaxDistance = 42;
+
+if (joystick && joystickKnob) {
+  joystick.addEventListener("pointerdown", (event) => {
+    joystickActive = true;
+
+    const rect = joystick.getBoundingClientRect();
+    joystickCenterX = rect.left + rect.width / 2;
+    joystickCenterY = rect.top + rect.height / 2;
+
+    joystick.setPointerCapture(event.pointerId);
+    updateJoystick(event);
+  });
+
+  joystick.addEventListener("pointermove", (event) => {
+    if (!joystickActive) return;
+    updateJoystick(event);
+  });
+
+  joystick.addEventListener("pointerup", () => {
+    resetJoystick();
+  });
+
+  joystick.addEventListener("pointercancel", () => {
+    resetJoystick();
+  });
+}
+
+if (mobileBrake) {
+  mobileBrake.addEventListener("pointerdown", () => {
+    mobileBrakePressed = true;
+  });
+
+  mobileBrake.addEventListener("pointerup", () => {
+    mobileBrakePressed = false;
+  });
+
+  mobileBrake.addEventListener("pointercancel", () => {
+    mobileBrakePressed = false;
+  });
+
+  mobileBrake.addEventListener("pointerleave", () => {
+    mobileBrakePressed = false;
+  });
+}
+
+function updateJoystick(event) {
+  const deltaX = event.clientX - joystickCenterX;
+  const deltaY = event.clientY - joystickCenterY;
+
+  const distance = Math.min(
+    Math.sqrt(deltaX * deltaX + deltaY * deltaY),
+    joystickMaxDistance
+  );
+
+  const angle = Math.atan2(deltaY, deltaX);
+
+  const knobX = Math.cos(angle) * distance;
+  const knobY = Math.sin(angle) * distance;
+
+  joystickKnob.style.transform = `translate(calc(-50% + ${knobX}px), calc(-50% + ${knobY}px))`;
+
+  // Left and right steering.
+  joystickTurn = knobX / joystickMaxDistance;
+
+  // Up moves forward. Down reverses.
+  joystickForward = -knobY / joystickMaxDistance;
+}
+
+function resetJoystick() {
+  joystickActive = false;
+  joystickForward = 0;
+  joystickTurn = 0;
+
+  if (joystickKnob) {
+    joystickKnob.style.transform = "translate(-50%, -50%)";
+  }
+}
+
+// ===============================
+// 8. LIGHTING
 // ===============================
 
 const ambientLight = new THREE.AmbientLight("#ffffff", 0.58);
@@ -216,7 +364,7 @@ moonLight.position.set(20, 35, 15);
 scene.add(moonLight);
 
 // ===============================
-// 8. CREATE WORLDS
+// 9. CREATE WORLDS
 // ===============================
 
 // Central hub
@@ -267,7 +415,7 @@ const animeWorld = createAnimeWorld(
 const animeStations = animeWorld.animeStations;
 
 // ===============================
-// 9. CREATE BRIDGES
+// 10. CREATE BRIDGES
 // ===============================
 
 // Main bridges from the central hub.
@@ -285,17 +433,17 @@ createBridgeBetween(WORLD_POSITIONS.music, WORLD_POSITIONS.anime, "#ff6b6b", "AN
 createBridgeBetween(WORLD_POSITIONS.anime, WORLD_POSITIONS.movie, "#ffcc66", "MOVIES");
 
 // ===============================
-// 10. ENVIRONMENT
+// 11. ENVIRONMENT
 // ===============================
 
-addTrees();
+// You removed the pine trees, so I did not add them back.
 addStars();
 
 // ===============================
-// 11. PLAYER CAR
+// 12. PLAYER CAR
 // ===============================
 
-const car = createCar();
+car = createCar();
 scene.add(car);
 
 // Start the player in the central hub.
@@ -307,7 +455,7 @@ camera.position.set(0, 16, 34);
 camera.lookAt(car.position);
 
 // ===============================
-// 12. BRIDGE SYSTEM
+// 13. BRIDGE SYSTEM
 // ===============================
 
 function createBridgeBetween(startWorld, endWorld, color, label) {
@@ -381,48 +529,145 @@ function createBridgeBetween(startWorld, endWorld, color, label) {
 }
 
 // ===============================
-// 13. CREATE CAR
+// 14. CREATE CAR
 // ===============================
 
 function createCar() {
   const group = new THREE.Group();
 
-  carBodyMaterial = new THREE.MeshStandardMaterial({
-    color: selectedCarColor,
+  // Load the selected car into this group.
+  loadSelectedCar(group);
+
+  return group;
+}
+
+function loadSelectedCar(targetCarGroup = car) {
+  if (!targetCarGroup) return;
+
+  const selectedCar = CAR_OPTIONS[selectedCarKey];
+
+  // Remove the previous car before adding the new one.
+  while (targetCarGroup.children.length > 0) {
+    const child = targetCarGroup.children[0];
+    targetCarGroup.remove(child);
+  }
+
+  if (selectedCar.type === "basic") {
+    const basicCar = createBasicCar(selectedCar.color);
+    targetCarGroup.add(basicCar);
+
+    console.log(`${selectedCar.name} loaded.`);
+    return;
+  }
+
+  if (selectedCar.type === "model") {
+    loadSelectedCarModel(targetCarGroup, selectedCar);
+  }
+}
+
+function loadSelectedCarModel(targetCarGroup, selectedCar) {
+  const loader = new GLTFLoader();
+
+  loader.load(
+    selectedCar.path,
+
+    function (gltf) {
+      activeCarModel = gltf.scene;
+
+      // Put the model inside a wrapper so we can center and scale it properly.
+      const modelWrapper = new THREE.Group();
+      modelWrapper.add(activeCarModel);
+
+      // Calculate the size and center of the model.
+      const box = new THREE.Box3().setFromObject(activeCarModel);
+      const size = new THREE.Vector3();
+      const center = new THREE.Vector3();
+
+      box.getSize(size);
+      box.getCenter(center);
+
+      // Move the model so its center is inside the car group.
+      activeCarModel.position.x -= center.x;
+      activeCarModel.position.y -= box.min.y;
+      activeCarModel.position.z -= center.z;
+
+      // Automatically scale the car to a good size.
+      const currentLength = Math.max(size.x, size.z);
+      const scaleFactor = selectedCar.targetLength / currentLength;
+
+      modelWrapper.scale.set(scaleFactor, scaleFactor, scaleFactor);
+
+      // Rotate the car so it faces the correct driving direction.
+      modelWrapper.rotation.y = selectedCar.rotationY;
+
+      targetCarGroup.add(modelWrapper);
+
+      console.log(`${selectedCar.name} loaded.`);
+    },
+
+    function () {
+      console.log(`${selectedCar.name} is loading...`);
+    },
+
+    function (error) {
+      console.log(`${selectedCar.name} could not load. Basic backup car added.`, error);
+
+      const backupCar = createBasicCar("#d62828");
+      targetCarGroup.add(backupCar);
+    }
+  );
+}
+
+function createBasicCar(color) {
+  const group = new THREE.Group();
+
+  const bodyMaterial = new THREE.MeshStandardMaterial({
+    color: color,
     roughness: 0.5
   });
 
   const body = new THREE.Mesh(
-    new THREE.BoxGeometry(2.4, 0.7, 4),
-    carBodyMaterial
+    new THREE.BoxGeometry(2.5, 0.75, 4.2),
+    bodyMaterial
   );
-  body.position.y = 0.55;
+  body.position.y = 0.65;
   group.add(body);
 
   const top = new THREE.Mesh(
-    new THREE.BoxGeometry(1.5, 0.65, 1.8),
+    new THREE.BoxGeometry(1.55, 0.7, 1.9),
     new THREE.MeshStandardMaterial({
       color: "#f77f00",
       roughness: 0.45
     })
   );
-  top.position.set(0, 1.15, -0.35);
+  top.position.set(0, 1.25, -0.35);
   group.add(top);
+
+  const windshield = new THREE.Mesh(
+    new THREE.BoxGeometry(1.35, 0.08, 0.75),
+    new THREE.MeshStandardMaterial({
+      color: "#9bdcff",
+      emissive: "#2d9cdb",
+      emissiveIntensity: 0.25
+    })
+  );
+  windshield.position.set(0, 1.45, 0.55);
+  group.add(windshield);
 
   const wheelMaterial = new THREE.MeshStandardMaterial({
     color: "#050505"
   });
 
   const wheelPositions = [
-    [-1.25, 0.35, 1.35],
-    [1.25, 0.35, 1.35],
-    [-1.25, 0.35, -1.35],
-    [1.25, 0.35, -1.35]
+    [-1.3, 0.35, 1.45],
+    [1.3, 0.35, 1.45],
+    [-1.3, 0.35, -1.45],
+    [1.3, 0.35, -1.45]
   ];
 
   wheelPositions.forEach((pos) => {
     const wheel = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.35, 0.35, 0.28, 20),
+      new THREE.CylinderGeometry(0.38, 0.38, 0.3, 20),
       wheelMaterial
     );
 
@@ -438,21 +683,38 @@ function createCar() {
   });
 
   const leftLight = new THREE.Mesh(
-    new THREE.BoxGeometry(0.35, 0.2, 0.08),
+    new THREE.BoxGeometry(0.4, 0.18, 0.08),
     lightMaterial
   );
-  leftLight.position.set(-0.55, 0.75, 2.05);
+  leftLight.position.set(-0.6, 0.82, 2.12);
   group.add(leftLight);
 
   const rightLight = leftLight.clone();
-  rightLight.position.x = 0.55;
+  rightLight.position.x = 0.6;
   group.add(rightLight);
+
+  const backLightMaterial = new THREE.MeshStandardMaterial({
+    color: "#ff3333",
+    emissive: "#ff3333",
+    emissiveIntensity: 0.8
+  });
+
+  const leftBackLight = new THREE.Mesh(
+    new THREE.BoxGeometry(0.35, 0.16, 0.08),
+    backLightMaterial
+  );
+  leftBackLight.position.set(-0.6, 0.8, -2.12);
+  group.add(leftBackLight);
+
+  const rightBackLight = leftBackLight.clone();
+  rightBackLight.position.x = 0.6;
+  group.add(rightBackLight);
 
   return group;
 }
 
 // ===============================
-// 14. FLOATING TEXT
+// 15. FLOATING TEXT
 // ===============================
 
 function createFloatingText(text, color) {
@@ -482,98 +744,6 @@ function createFloatingText(text, color) {
   sprite.scale.set(7, 1.8, 1);
 
   return sprite;
-}
-
-// ===============================
-// 15. TREES
-// ===============================
-
-function addTrees() {
-  const loader = new GLTFLoader();
-
-  // Your tree model should be inside:
-  // models/pine_tree.glb
-  const treeModelPath = "models/";
-
-  loader.load(
-    treeModelPath,
-
-    function (gltf) {
-      const originalTree = gltf.scene;
-
-      for (let i = 0; i < 80; i++) {
-        const worldKeys = Object.keys(WORLD_POSITIONS);
-        const randomWorld =
-          WORLD_POSITIONS[worldKeys[Math.floor(Math.random() * worldKeys.length)]];
-
-        const angle = Math.random() * Math.PI * 2;
-        const radius = randomWorld.radius + 8 + Math.random() * 16;
-
-        const tree = originalTree.clone(true);
-
-        tree.position.set(
-          randomWorld.x + Math.cos(angle) * radius,
-          0,
-          randomWorld.z + Math.sin(angle) * radius
-        );
-
-        tree.scale.set(1.5, 1.5, 1.5);
-        tree.rotation.y = Math.random() * Math.PI * 2;
-
-        scene.add(tree);
-      }
-
-      console.log("Tree model loaded.");
-    },
-
-    function () {
-      console.log("Tree model is loading...");
-    },
-
-    function () {
-      console.log("Tree model could not load. Backup trees added.");
-      addSimpleTrees();
-    }
-  );
-}
-
-function addSimpleTrees() {
-  for (let i = 0; i < 80; i++) {
-    const worldKeys = Object.keys(WORLD_POSITIONS);
-    const randomWorld =
-      WORLD_POSITIONS[worldKeys[Math.floor(Math.random() * worldKeys.length)]];
-
-    const angle = Math.random() * Math.PI * 2;
-    const radius = randomWorld.radius + 8 + Math.random() * 16;
-
-    const tree = new THREE.Group();
-
-    const trunk = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.15, 0.2, 1.2, 8),
-      new THREE.MeshStandardMaterial({
-        color: "#5c3d2e"
-      })
-    );
-    trunk.position.y = 0.6;
-    tree.add(trunk);
-
-    const leaves = new THREE.Mesh(
-      new THREE.ConeGeometry(0.8, 1.8, 10),
-      new THREE.MeshStandardMaterial({
-        color: "#1b7f3a"
-      })
-    );
-    leaves.position.y = 1.8;
-    tree.add(leaves);
-
-    tree.position.set(
-      randomWorld.x + Math.cos(angle) * radius,
-      0,
-      randomWorld.z + Math.sin(angle) * radius
-    );
-
-    scene.add(tree);
-  }
 }
 
 // ===============================
@@ -621,26 +791,49 @@ function updateCarMovement() {
   const leftPressed = keys["a"] || keys["arrowleft"];
   const rightPressed = keys["d"] || keys["arrowright"];
 
+  let forwardInput = 0;
+  let turnInput = 0;
+
+  // Keyboard input
   if (forwardPressed) {
-    speed += 0.015;
-  } else if (backwardPressed) {
-    speed -= 0.012;
+    forwardInput += 1;
+  }
+
+  if (backwardPressed) {
+    forwardInput -= 1;
+  }
+
+  if (leftPressed) {
+    turnInput += 1;
+  }
+
+  if (rightPressed) {
+    turnInput -= 1;
+  }
+
+  // Mobile joystick input
+  forwardInput += joystickForward;
+  turnInput += joystickTurn;
+
+  forwardInput = THREE.MathUtils.clamp(forwardInput, -1, 1);
+  turnInput = THREE.MathUtils.clamp(turnInput, -1, 1);
+
+  if (forwardInput > 0.05) {
+    speed += 0.015 * forwardInput;
+  } else if (forwardInput < -0.05) {
+    speed += 0.012 * forwardInput;
   } else {
     speed *= 0.94;
   }
 
-  speed = THREE.MathUtils.clamp(speed, -0.18, 0.32);
-
-  if (leftPressed) {
-    rotationSpeed = 0.04;
-  } else if (rightPressed) {
-    rotationSpeed = -0.04;
-  } else {
-    rotationSpeed = 0;
+  if (mobileBrakePressed) {
+    speed *= 0.82;
   }
 
+  speed = THREE.MathUtils.clamp(speed, -0.18, 0.32);
+
   if (Math.abs(speed) > 0.01) {
-    car.rotation.y += rotationSpeed * Math.sign(speed);
+    car.rotation.y += 0.04 * turnInput * Math.sign(speed);
   }
 
   // Save old position first.
@@ -799,7 +992,7 @@ function checkStationDistance() {
       currentStation = nearestGame.station;
     }
   } else if (nearestAnime.station && nearestAnime.distance < 8) {
-    currentGenreText.textContent = `${nearestAnime.station.genre.name} Anime Station`;
+    currentGenreText.textContent = `${nearestAnime.station.genre.name} Station`;
 
     if (currentStation !== nearestAnime.station) {
       closeAllPanels();
@@ -1064,7 +1257,7 @@ function closeGamePanelFunction() {
 function openAnimePanel(genre) {
   if (!animePanel) return;
 
-  animePanelTitle.textContent = `${genre.name} Anime Station`;
+  animePanelTitle.textContent = genre.name;
   animePanelDescription.textContent = genre.description;
   animeList.innerHTML = "";
 

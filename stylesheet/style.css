@@ -338,3 +338,301 @@ body {
     height: 200px;
   }
 }
+
+
+/* ===============================
+   3D CAR MODEL SELECTION
+   =============================== */
+
+#carSelection {
+  margin: 28px 0;
+  width: min(760px, 95vw);
+}
+
+#carSelection h2 {
+  font-size: 22px;
+  margin-bottom: 16px;
+}
+
+.carModelOptions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.carModelCard {
+  min-height: 115px;
+  padding: 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+  cursor: pointer;
+  transition: 0.2s;
+  text-align: center;
+  backdrop-filter: blur(10px);
+}
+
+.carModelCard:hover {
+  transform: translateY(-4px);
+  border-color: #ffcc66;
+  background: rgba(255, 204, 102, 0.12);
+}
+
+.carModelCard.selected {
+  border-color: #ffcc66;
+  box-shadow: 0 0 24px rgba(255, 204, 102, 0.6);
+  background: rgba(255, 204, 102, 0.16);
+}
+
+.carModelCard.locked {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.carModelCard.locked:hover {
+  transform: none;
+  border-color: rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.carIcon {
+  display: block;
+  font-size: 28px;
+  margin-bottom: 8px;
+}
+
+.carModelCard strong {
+  display: block;
+  font-size: 15px;
+  margin-bottom: 5px;
+}
+
+.carModelCard small {
+  color: #cccccc;
+  font-size: 12px;
+}
+
+@media (max-width: 800px) {
+  .carModelOptions {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 520px) {
+  .carModelOptions {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===============================
+   RESPONSIVE BASE FIXES
+   =============================== */
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  overscroll-behavior: none;
+  touch-action: none;
+}
+
+#world {
+  width: 100vw;
+  height: 100vh;
+}
+
+/* ===============================
+   MOBILE JOYSTICK CONTROLS
+   =============================== */
+
+#mobileControls {
+  display: none;
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  pointer-events: none;
+  z-index: 40;
+}
+
+#joystick {
+  position: absolute;
+  left: 28px;
+  bottom: 32px;
+  width: 120px;
+  height: 120px;
+
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(12px);
+
+  pointer-events: auto;
+  touch-action: none;
+}
+
+#joystickKnob {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+
+  width: 54px;
+  height: 54px;
+
+  border-radius: 50%;
+  background: rgba(255, 204, 102, 0.9);
+  box-shadow: 0 0 22px rgba(255, 204, 102, 0.7);
+
+  transform: translate(-50%, -50%);
+}
+
+#mobileBrake {
+  position: absolute;
+  right: 28px;
+  bottom: 52px;
+
+  width: 96px;
+  height: 96px;
+
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 107, 107, 0.9);
+  color: white;
+
+  font-size: 15px;
+  font-weight: bold;
+  text-transform: uppercase;
+
+  pointer-events: auto;
+  touch-action: none;
+  box-shadow: 0 0 22px rgba(255, 107, 107, 0.55);
+}
+
+/* Only show joystick on tablets and phones */
+@media (max-width: 900px) {
+  #mobileControls {
+    display: block;
+  }
+
+  #hud {
+    left: 14px;
+    top: 14px;
+    max-width: calc(100vw - 28px);
+    padding: 12px 14px;
+    border-radius: 16px;
+  }
+
+  #hud h2 {
+    font-size: 18px;
+  }
+
+  #hud p {
+    font-size: 12px;
+  }
+}
+
+/* Smaller phone version */
+@media (max-width: 520px) {
+  #joystick {
+    width: 105px;
+    height: 105px;
+    left: 18px;
+    bottom: 24px;
+  }
+
+  #joystickKnob {
+    width: 48px;
+    height: 48px;
+  }
+
+  #mobileBrake {
+    width: 82px;
+    height: 82px;
+    right: 18px;
+    bottom: 36px;
+    font-size: 13px;
+  }
+}
+
+/* ===============================
+   RESPONSIVE POPUPS
+   =============================== */
+
+@media (max-width: 900px) {
+  #moviePanel,
+  #tvPanel,
+  #musicPanel,
+  #gamePanel,
+  #animePanel {
+    left: 14px;
+    right: 14px;
+    top: auto;
+    bottom: 160px;
+
+    width: auto;
+    max-width: none;
+    max-height: 52vh;
+
+    transform: none;
+    padding: 18px;
+    border-radius: 20px;
+  }
+
+  #movieContent,
+  #tvContent,
+  #musicContent,
+  #gameContent,
+  #animeContent {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  #trailerFrame,
+  #tvTrailerFrame,
+  #musicVideoFrame,
+  #gameTrailerFrame,
+  #animeTrailerFrame {
+    height: 190px;
+  }
+}
+
+@media (max-width: 520px) {
+  #moviePanel,
+  #tvPanel,
+  #musicPanel,
+  #gamePanel,
+  #animePanel {
+    bottom: 145px;
+    max-height: 50vh;
+    padding: 16px;
+  }
+
+  #panelTitle,
+  #tvPanelTitle,
+  #musicPanelTitle,
+  #gamePanelTitle,
+  #animePanelTitle {
+    font-size: 22px;
+  }
+
+  #panelDescription,
+  #tvPanelDescription,
+  #musicPanelDescription,
+  #gamePanelDescription,
+  #animePanelDescription {
+    font-size: 13px;
+  }
+
+  #trailerFrame,
+  #tvTrailerFrame,
+  #musicVideoFrame,
+  #gameTrailerFrame,
+  #animeTrailerFrame {
+    height: 160px;
+  }
+}
