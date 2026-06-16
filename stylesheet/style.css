@@ -1,4 +1,3 @@
-/* Global reset and base page styles */
 * {
   box-sizing: border-box;
 }
@@ -11,52 +10,16 @@ body {
   color: white;
 }
 
-
 #world {
   display: block;
   width: 100vw;
   height: 100vh;
 }
 
-#startScreen {
-  position: fixed;
-  inset: 0;
-  background:
-    linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.9)),
-    radial-gradient(circle at center, #742222, #050505 65%);
-  z-index: 20;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 30px;
+.hidden {
+  display: none;
 }
 
-#startScreen h1 {
-  font-size: 56px;
-  margin: 0 0 15px;
-}
-
-#startScreen p {
-  max-width: 600px;
-  font-size: 18px;
-  line-height: 1.5;
-  color: #ddd;
-}
-
-#startBtn {
-  margin-top: 25px;
-  padding: 14px 32px;
-  border: none;
-  border-radius: 999px;
-  background: #ff3434;
-  color: white;
-  font-size: 18px;
-  cursor: pointer;
-}
-
-/* Heads-up display panel showing controls and current genre */
 #hud {
   position: fixed;
   left: 20px;
@@ -70,7 +33,6 @@ body {
   backdrop-filter: blur(10px);
 }
 
-
 #hud h2 {
   margin: 0 0 8px;
   color: #ffcc66;
@@ -82,65 +44,178 @@ body {
   font-size: 14px;
 }
 
-#moviePanel {
+@media (max-width: 800px) {
+  #hud {
+    max-width: calc(100vw - 40px);
+  }
+}
+
+/* ===============================
+   CLEAN UNIVERSAL POPUP SYSTEM
+   This fixes Movie, TV, Music, Game, and Anime panels.
+   =============================== */
+
+#moviePanel,
+#tvPanel,
+#musicPanel,
+#gamePanel,
+#animePanel {
   position: fixed;
-  right: 30px;
   top: 50%;
+  right: 28px;
   transform: translateY(-50%);
-  width: 520px;
-  max-width: calc(100vw - 40px);
-  max-height: 86vh;
+  width: 540px;
+  max-width: calc(100vw - 56px);
+  max-height: 82vh;
   overflow-y: auto;
-  background: rgba(10, 10, 10, 0.92);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+
+  background: rgba(8, 8, 14, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 24px;
-  z-index: 15;
-  padding: 24px;
-  box-shadow: 0 0 45px rgba(255, 60, 60, 0.25);
-  backdrop-filter: blur(12px);
+  padding: 26px;
+
+  z-index: 30;
+  backdrop-filter: blur(14px);
+  box-shadow: 0 0 45px rgba(0, 0, 0, 0.65);
 }
 
+/* Panel colors */
+#moviePanel {
+  border-color: rgba(255, 204, 102, 0.45);
+  box-shadow: 0 0 45px rgba(255, 204, 102, 0.22);
+}
+
+#tvPanel {
+  border-color: rgba(124, 199, 255, 0.45);
+  box-shadow: 0 0 45px rgba(124, 199, 255, 0.22);
+}
+
+#musicPanel {
+  border-color: rgba(255, 142, 232, 0.45);
+  box-shadow: 0 0 45px rgba(255, 142, 232, 0.22);
+}
+
+#gamePanel {
+  border-color: rgba(128, 237, 153, 0.45);
+  box-shadow: 0 0 45px rgba(128, 237, 153, 0.22);
+}
+
+#animePanel {
+  border-color: rgba(255, 107, 107, 0.45);
+  box-shadow: 0 0 45px rgba(255, 107, 107, 0.22);
+}
+
+/* Hide panels */
 .hidden {
-  display: none;
+  display: none !important;
 }
 
-#closePanel {
+/* Close buttons */
+#closePanel,
+#closeTvPanel,
+#closeMusicPanel,
+#closeGamePanel,
+#closeAnimePanel {
   position: absolute;
-  right: 18px;
   top: 14px;
-  background: none;
+  right: 18px;
+
+  background: rgba(255, 255, 255, 0.08);
   color: white;
   border: none;
-  font-size: 34px;
+  border-radius: 50%;
+
+  width: 38px;
+  height: 38px;
+
+  font-size: 28px;
+  line-height: 34px;
   cursor: pointer;
 }
 
+#closePanel:hover,
+#closeTvPanel:hover,
+#closeMusicPanel:hover,
+#closeGamePanel:hover,
+#closeAnimePanel:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+/* Panel titles */
+#panelTitle,
+#tvPanelTitle,
+#musicPanelTitle,
+#gamePanelTitle,
+#animePanelTitle {
+  margin: 0 45px 10px 0;
+  font-size: 28px;
+  line-height: 1.1;
+}
+
 #panelTitle {
-  margin-top: 0;
   color: #ffcc66;
 }
 
-#panelDescription {
-  color: #ddd;
-  line-height: 1.4;
+#tvPanelTitle {
+  color: #7cc7ff;
 }
 
-#movieContent {
-  display: flex;
-  gap: 16px;
+#musicPanelTitle {
+  color: #ff8ee8;
 }
 
-#movieList {
-  flex: 1;
+#gamePanelTitle {
+  color: #80ed99;
+}
+
+#animePanelTitle {
+  color: #ff6b6b;
+}
+
+/* Panel descriptions */
+#panelDescription,
+#tvPanelDescription,
+#musicPanelDescription,
+#gamePanelDescription,
+#animePanelDescription {
+  color: #dddddd;
+  line-height: 1.5;
+  margin-bottom: 18px;
+  font-size: 15px;
+}
+
+/* Content layout */
+#movieContent,
+#tvContent,
+#musicContent,
+#gameContent,
+#animeContent {
+  display: grid;
+  grid-template-columns: 1fr 1.25fr;
+  gap: 18px;
+  align-items: start;
+}
+
+/* Lists */
+#movieList,
+#tvList,
+#musicList,
+#gameList,
+#animeList {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.movieCard {
+/* Cards */
+.movieCard,
+.tvCard,
+.musicCard,
+.gameCard,
+.animeCard {
   background: rgba(255, 255, 255, 0.08);
-  padding: 12px;
-  border-radius: 14px;
+  padding: 14px;
+  border-radius: 16px;
   cursor: pointer;
   border: 1px solid transparent;
   transition: 0.2s;
@@ -148,56 +223,118 @@ body {
 
 .movieCard:hover {
   border-color: #ffcc66;
+  background: rgba(255, 204, 102, 0.12);
   transform: translateX(4px);
-  background: rgba(255, 255, 255, 0.14);
 }
 
-.movieCard h3 {
-  margin: 0 0 5px;
+.tvCard:hover {
+  border-color: #7cc7ff;
+  background: rgba(124, 199, 255, 0.12);
+  transform: translateX(4px);
+}
+
+.musicCard:hover {
+  border-color: #ff8ee8;
+  background: rgba(255, 142, 232, 0.12);
+  transform: translateX(4px);
+}
+
+.gameCard:hover {
+  border-color: #80ed99;
+  background: rgba(128, 237, 153, 0.12);
+  transform: translateX(4px);
+}
+
+.animeCard:hover {
+  border-color: #ff6b6b;
+  background: rgba(255, 107, 107, 0.12);
+  transform: translateX(4px);
+}
+
+.movieCard h3,
+.tvCard h3,
+.musicCard h3,
+.gameCard h3,
+.animeCard h3 {
+  margin: 0 0 6px;
   font-size: 16px;
+  color: white;
 }
 
-.movieCard p {
+.movieCard p,
+.tvCard p,
+.musicCard p,
+.gameCard p,
+.animeCard p {
   margin: 0;
-  color: #bbb;
   font-size: 13px;
+  color: #bbbbbb;
+  line-height: 1.4;
 }
 
-#previewBox {
-  flex: 1.2;
+/* Preview boxes */
+#previewBox,
+#tvPreviewBox,
+#musicPreviewBox,
+#gamePreviewBox,
+#animePreviewBox {
+  min-width: 0;
 }
 
-#previewBox h3 {
-  margin-top: 0;
+#previewBox h3,
+#tvPreviewBox h3,
+#musicPreviewBox h3,
+#gamePreviewBox h3,
+#animePreviewBox h3 {
+  margin: 0 0 10px;
+  font-size: 16px;
+  color: white;
 }
 
-#trailerFrame {
+/* Video frames */
+#trailerFrame,
+#tvTrailerFrame,
+#musicVideoFrame,
+#gameTrailerFrame,
+#animeTrailerFrame {
   width: 100%;
-  height: 210px;
+  height: 230px;
   border: none;
-  border-radius: 14px;
+  border-radius: 16px;
   background: black;
 }
 
-@media (max-width: 800px) {
-  #moviePanel {
-    left: 20px;
-    right: 20px;
+/* Mobile / small screen version */
+@media (max-width: 850px) {
+  #moviePanel,
+  #tvPanel,
+  #musicPanel,
+  #gamePanel,
+  #animePanel {
+    left: 18px;
+    right: 18px;
     top: auto;
-    bottom: 20px;
+    bottom: 18px;
     transform: none;
+
     width: auto;
+    max-width: none;
+    max-height: 75vh;
   }
 
-  #movieContent {
-    flex-direction: column;
+  #movieContent,
+  #tvContent,
+  #musicContent,
+  #gameContent,
+  #animeContent {
+    grid-template-columns: 1fr;
   }
 
-  #hud {
-    max-width: calc(100vw - 40px);
-  }
-
-  #startScreen h1 {
-    font-size: 38px;
+  #trailerFrame,
+  #tvTrailerFrame,
+  #musicVideoFrame,
+  #gameTrailerFrame,
+  #animeTrailerFrame {
+    height: 200px;
   }
 }

@@ -1,0 +1,120 @@
+/* ===============================
+   TV SHOW WORLD POPUP PANEL
+   =============================== */
+
+/* Main TV popup panel */
+#tvPanel {
+  position: fixed;
+  left: 30px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 520px;
+  max-width: calc(100vw - 40px);
+  max-height: 86vh;
+  overflow-y: auto;
+  background: rgba(8, 10, 22, 0.94);
+  border: 1px solid rgba(110, 180, 255, 0.35);
+  border-radius: 24px;
+  z-index: 15;
+  padding: 24px;
+  box-shadow: 0 0 45px rgba(70, 150, 255, 0.28);
+  backdrop-filter: blur(12px);
+}
+
+/* Close button for TV panel */
+#closeTvPanel {
+  position: absolute;
+  right: 18px;
+  top: 14px;
+  background: none;
+  color: white;
+  border: none;
+  font-size: 34px;
+  cursor: pointer;
+}
+
+/* TV panel title */
+#tvPanelTitle {
+  margin-top: 0;
+  color: #7cc7ff;
+}
+
+/* TV panel description */
+#tvPanelDescription {
+  color: #ddd;
+  line-height: 1.4;
+}
+
+/* TV content layout */
+#tvContent {
+  display: flex;
+  gap: 16px;
+}
+
+/* TV show list */
+#tvList {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Individual TV show card */
+.tvCard {
+  background: rgba(255, 255, 255, 0.08);
+  padding: 12px;
+  border-radius: 14px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: 0.2s;
+}
+
+.tvCard:hover {
+  border-color: #7cc7ff;
+  transform: translateX(4px);
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.tvCard h3 {
+  margin: 0 0 5px;
+  font-size: 16px;
+}
+
+.tvCard p {
+  margin: 0;
+  color: #bbb;
+  font-size: 13px;
+}
+
+/* TV trailer preview area */
+#tvPreviewBox {
+  flex: 1.2;
+}
+
+#tvPreviewBox h3 {
+  margin-top: 0;
+}
+
+#tvTrailerFrame {
+  width: 100%;
+  height: 210px;
+  border: none;
+  border-radius: 14px;
+  background: black;
+}
+
+/* Responsive TV panel */
+@media (max-width: 800px) {
+  #tvPanel {
+    left: 20px;
+    right: 20px;
+    top: auto;
+    bottom: 20px;
+    transform: none;
+    width: auto;
+  }
+
+  #tvContent {
+    flex-direction: column;
+  }
+}

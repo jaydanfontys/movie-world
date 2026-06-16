@@ -3,34 +3,56 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Movie World Drive-In</title>
-  <link rel="stylesheet" href="/stylesheet/style.css" />
 
-  <!-- Import map for loading the Three.js module from CDN -->
+  <title>World of Entertainment</title>
+<link rel="stylesheet" href="stylesheet/style.css" />
+<link rel="stylesheet" href="stylesheet/hub-world.css" />
+<link rel="stylesheet" href="stylesheet/movie-world.css" />
+<link rel="stylesheet" href="stylesheet/tv-world.css" />
+<link rel="stylesheet" href="stylesheet/music-world.css" />
+<link rel="stylesheet" href="stylesheet/game-world.css" />
+<link rel="stylesheet" href="stylesheet/anime-world.css" />
+
   <script type="importmap">
     {
       "imports": {
-        "three": "https://cdn.jsdelivr.net/npm/three@0.184.0/build/three.module.js"
+        "three": "https://cdn.jsdelivr.net/npm/three@0.184.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.184.0/examples/jsm/"
       }
     }
   </script>
 </head>
+
 <body>
   <div id="startScreen">
-    <h1>Movie World Drive-In</h1>
+    <h1>World of Entertainment</h1>
     <p>
-      You only know superhero movies. Drive through the world and discover new movie genres.
+      Choose your car, start from the central hub, and drive to different entertainment worlds.
+      Discover movies, TV shows, music videos, games, and anime.
     </p>
-    <button id="startBtn">Start Driving</button>
+
+    <div id="carSelection">
+      <h2>Choose Your Car</h2>
+
+      <div class="carOptions">
+        <button class="carColor selected" data-color="#d62828" style="background:#d62828;"></button>
+        <button class="carColor" data-color="#1d4ed8" style="background:#1d4ed8;"></button>
+        <button class="carColor" data-color="#16a34a" style="background:#16a34a;"></button>
+        <button class="carColor" data-color="#facc15" style="background:#facc15;"></button>
+        <button class="carColor" data-color="#ffffff" style="background:#ffffff;"></button>
+        <button class="carColor" data-color="#111111" style="background:#111111;"></button>
+      </div>
+    </div>
+
+    <button id="startBtn">Start Exploring</button>
   </div>
 
   <div id="hud">
-    <h2 id="currentGenre">Explore the world</h2>
-    <p>Use W A S D or Arrow Keys to drive. Go near a theater to open its movie screen.</p>
+    <h2 id="currentGenre">Central Entertainment Hub</h2>
+    <p>Use W A S D or Arrow Keys to drive. Go near a station to open its panel.</p>
   </div>
 
   <div id="moviePanel" class="hidden">
-    <!-- Movie detail panel shown when the car is near a theater -->
     <button id="closePanel">×</button>
     <h2 id="panelTitle">Genre</h2>
     <p id="panelDescription"></p>
@@ -40,19 +62,73 @@
 
       <div id="previewBox">
         <h3>Trailer Preview</h3>
-        <iframe
-          id="trailerFrame"
-          src=""
-          title="Movie trailer"
-          allowfullscreen>
-        </iframe>
+        <iframe id="trailerFrame" src="" title="Movie trailer" allowfullscreen></iframe>
       </div>
     </div>
   </div>
 
-  <!-- WebGL canvas where the Three.js scene is rendered -->
+  <div id="tvPanel" class="hidden">
+    <button id="closeTvPanel">×</button>
+    <h2 id="tvPanelTitle">TV Genre</h2>
+    <p id="tvPanelDescription"></p>
+
+    <div id="tvContent">
+      <div id="tvList"></div>
+
+      <div id="tvPreviewBox">
+        <h3>TV Show Preview</h3>
+        <iframe id="tvTrailerFrame" src="" title="TV show trailer" allowfullscreen></iframe>
+      </div>
+    </div>
+  </div>
+
+  <div id="musicPanel" class="hidden">
+    <button id="closeMusicPanel">×</button>
+    <h2 id="musicPanelTitle">Music Genre</h2>
+    <p id="musicPanelDescription"></p>
+
+    <div id="musicContent">
+      <div id="musicList"></div>
+
+      <div id="musicPreviewBox">
+        <h3>Music Video Preview</h3>
+        <iframe id="musicVideoFrame" src="" title="Music video preview" allowfullscreen></iframe>
+      </div>
+    </div>
+  </div>
+
+  <div id="gamePanel" class="hidden">
+    <button id="closeGamePanel">×</button>
+    <h2 id="gamePanelTitle">Game Genre</h2>
+    <p id="gamePanelDescription"></p>
+
+    <div id="gameContent">
+      <div id="gameList"></div>
+
+      <div id="gamePreviewBox">
+        <h3>Game Trailer Preview</h3>
+        <iframe id="gameTrailerFrame" src="" title="Game trailer preview" allowfullscreen></iframe>
+      </div>
+    </div>
+  </div>
+
+  <div id="animePanel" class="hidden">
+    <button id="closeAnimePanel">×</button>
+    <h2 id="animePanelTitle">Anime Genre</h2>
+    <p id="animePanelDescription"></p>
+
+    <div id="animeContent">
+      <div id="animeList"></div>
+
+      <div id="animePreviewBox">
+        <h3>Anime Trailer Preview</h3>
+        <iframe id="animeTrailerFrame" src="" title="Anime trailer preview" allowfullscreen></iframe>
+      </div>
+    </div>
+  </div>
+
   <canvas id="world"></canvas>
 
-  <script type="module" src="/js/three.js"></script>
+  <script type="module" src="js/three.js"></script>
 </body>
 </html>

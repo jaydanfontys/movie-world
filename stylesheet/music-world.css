@@ -1,0 +1,111 @@
+/* ===============================
+   MUSIC WORLD POPUP PANEL
+   =============================== */
+
+#musicPanel {
+  position: fixed;
+  left: 30px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 520px;
+  max-width: calc(100vw - 40px);
+  max-height: 86vh;
+  overflow-y: auto;
+  background: rgba(16, 8, 24, 0.94);
+  border: 1px solid rgba(255, 120, 220, 0.35);
+  border-radius: 24px;
+  z-index: 15;
+  padding: 24px;
+  box-shadow: 0 0 45px rgba(255, 90, 210, 0.25);
+  backdrop-filter: blur(12px);
+}
+
+#closeMusicPanel {
+  position: absolute;
+  right: 18px;
+  top: 14px;
+  background: none;
+  color: white;
+  border: none;
+  font-size: 34px;
+  cursor: pointer;
+}
+
+#musicPanelTitle {
+  margin-top: 0;
+  color: #ff8ee8;
+}
+
+#musicPanelDescription {
+  color: #ddd;
+  line-height: 1.4;
+}
+
+#musicContent {
+  display: flex;
+  gap: 16px;
+}
+
+#musicList {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.musicCard {
+  background: rgba(255, 255, 255, 0.08);
+  padding: 12px;
+  border-radius: 14px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: 0.2s;
+}
+
+.musicCard:hover {
+  border-color: #ff8ee8;
+  transform: translateX(4px);
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.musicCard h3 {
+  margin: 0 0 5px;
+  font-size: 16px;
+}
+
+.musicCard p {
+  margin: 0;
+  color: #bbb;
+  font-size: 13px;
+}
+
+#musicPreviewBox {
+  flex: 1.2;
+}
+
+#musicPreviewBox h3 {
+  margin-top: 0;
+}
+
+#musicVideoFrame {
+  width: 100%;
+  height: 210px;
+  border: none;
+  border-radius: 14px;
+  background: black;
+}
+
+@media (max-width: 800px) {
+  #musicPanel {
+    left: 20px;
+    right: 20px;
+    top: auto;
+    bottom: 20px;
+    transform: none;
+    width: auto;
+  }
+
+  #musicContent {
+    flex-direction: column;
+  }
+}

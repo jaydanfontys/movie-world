@@ -1,0 +1,111 @@
+/* ===============================
+   GAME WORLD POPUP PANEL
+   =============================== */
+
+#gamePanel {
+  position: fixed;
+  right: 30px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 520px;
+  max-width: calc(100vw - 40px);
+  max-height: 86vh;
+  overflow-y: auto;
+  background: rgba(7, 12, 22, 0.94);
+  border: 1px solid rgba(120, 255, 170, 0.35);
+  border-radius: 24px;
+  z-index: 15;
+  padding: 24px;
+  box-shadow: 0 0 45px rgba(80, 255, 150, 0.22);
+  backdrop-filter: blur(12px);
+}
+
+#closeGamePanel {
+  position: absolute;
+  right: 18px;
+  top: 14px;
+  background: none;
+  color: white;
+  border: none;
+  font-size: 34px;
+  cursor: pointer;
+}
+
+#gamePanelTitle {
+  margin-top: 0;
+  color: #80ed99;
+}
+
+#gamePanelDescription {
+  color: #ddd;
+  line-height: 1.4;
+}
+
+#gameContent {
+  display: flex;
+  gap: 16px;
+}
+
+#gameList {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.gameCard {
+  background: rgba(255, 255, 255, 0.08);
+  padding: 12px;
+  border-radius: 14px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: 0.2s;
+}
+
+.gameCard:hover {
+  border-color: #80ed99;
+  transform: translateX(4px);
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.gameCard h3 {
+  margin: 0 0 5px;
+  font-size: 16px;
+}
+
+.gameCard p {
+  margin: 0;
+  color: #bbb;
+  font-size: 13px;
+}
+
+#gamePreviewBox {
+  flex: 1.2;
+}
+
+#gamePreviewBox h3 {
+  margin-top: 0;
+}
+
+#gameTrailerFrame {
+  width: 100%;
+  height: 210px;
+  border: none;
+  border-radius: 14px;
+  background: black;
+}
+
+@media (max-width: 800px) {
+  #gamePanel {
+    left: 20px;
+    right: 20px;
+    top: auto;
+    bottom: 20px;
+    transform: none;
+    width: auto;
+  }
+
+  #gameContent {
+    flex-direction: column;
+  }
+}

@@ -1,0 +1,86 @@
+#startScreen {
+  position: fixed;
+  inset: 0;
+  background:
+    linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.9)),
+    radial-gradient(circle at center, #263238, #050505 68%);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 30px;
+}
+
+#startScreen h1 {
+  font-size: 56px;
+  margin: 0 0 15px;
+}
+
+#startScreen p {
+  max-width: 650px;
+  font-size: 18px;
+  line-height: 1.5;
+  color: #ddd;
+}
+
+#startBtn {
+  margin-top: 25px;
+  padding: 14px 32px;
+  border: none;
+  border-radius: 999px;
+  background: #ffcc66;
+  color: #111;
+  font-size: 18px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+#startBtn:hover {
+  background: #ffe08a;
+}
+
+#carSelection {
+  margin: 25px 0;
+}
+
+#carSelection h2 {
+  font-size: 20px;
+  margin-bottom: 12px;
+}
+
+.carOptions {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.carColor {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.carColor:hover {
+  transform: scale(1.12);
+}
+
+.carColor.selected {
+  border-color: #ffffff;
+  box-shadow: 0 0 18px rgba(255, 255, 255, 0.8);
+}
+
+@media (max-width: 800px) {
+  #startScreen h1 {
+    font-size: 38px;
+  }
+
+  #startScreen p {
+    font-size: 15px;
+  }
+}
