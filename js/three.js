@@ -336,7 +336,9 @@ function updateJoystick(event) {
   joystickKnob.style.transform = `translate(calc(-50% + ${knobX}px), calc(-50% + ${knobY}px))`;
 
   // Left and right steering.
-  joystickTurn = knobX / joystickMaxDistance;
+// We make right negative and left positive because the car rotation uses:
+// positive = left, negative = right.
+joystickTurn = -knobX / joystickMaxDistance;
 
   // Up moves forward. Down reverses.
   joystickForward = -knobY / joystickMaxDistance;
