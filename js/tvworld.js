@@ -1,4 +1,74 @@
 import * as THREE from "three";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { CSS3DObject } from "three/addons/renderers/CSS3DRenderer.js";
+
+// ===============================
+// MODEL PATHS
+// ===============================
+
+const TV_MODEL_PATH = "models/tv_screen.glb";
+const REMOTE_MODEL_PATH = "models/90s_tv_remote.glb";
+const COUCH_MODEL_PATH = "models/outdoor_couch.glb";
+
+// ===============================
+// MODEL SETTINGS
+// ===============================
+
+// Change these if the models are too big or too small.
+const TV_MODEL_SCALE = new THREE.Vector3(0.15, 0.15, 0.15);
+const COUCH_MODEL_SCALE = new THREE.Vector3(0.9, 0.9, 0.9);
+const REMOTE_MODEL_SCALE = new THREE.Vector3(5, 5, 5);
+
+// TV model position inside each TV station.
+const TV_MODEL_POSITION = new THREE.Vector3(0, -13 -2);
+
+// Couch position in front of each TV.
+const COUCH_MODEL_POSITION = new THREE.Vector3(0, 0, 3.2);
+
+// Floating remote position in the middle of TV World.
+const REMOTE_MODEL_POSITION = new THREE.Vector3(0, 5, 0);
+
+// Change this if the remote faces the wrong direction.
+const REMOTE_MODEL_ROTATION = new THREE.Vector3(0, 0, 0);
+
+// ===============================
+// YOUTUBE SCREEN SETTINGS
+// ===============================
+
+// This controls where the YouTube screen appears on the TV model.
+// x = left/right
+// y = up/down
+// z = forward/back
+const TV_YOUTUBE_SCREEN_POSITION = new THREE.Vector3(0, 3, 0.75);
+// Bigger/smaller YouTube iframe screen.
+const TV_YOUTUBE_SCREEN_WIDTH = 8.5;
+const TV_YOUTUBE_SCREEN_HEIGHT = 4.5;
+
+// ===============================
+// MODEL CACHE
+// ===============================
+
+let tvModelPromise = null;
+let remoteModelPromise = null;
+let couchModelPromise = null;
+
+// ===============================
+// CSS3D VIDEO SCREEN MEMORY
+// ===============================
+
+let savedCssScene = null;
+let savedWorldPosition = null;
+const savedTVStations = {};
+
+let activeTVScreenGroup = null;
+let activeTVGenreName = null;
+
+// ===============================
+// FLOATING REMOTE ANIMATION
+// ===============================
+
+let remoteHolder = null;
+let remoteAnimationStarted = false;
 
 // ===============================
 // TV SHOW WORLD DATA
@@ -119,7 +189,10 @@ export const tvShowData = [
 // CREATE TV SHOW WORLD
 // ===============================
 
-export function createTVWorld(scene, createFloatingText, position) {
+export function createTVWorld(scene, cssScene, createFloatingText, position) {
+  savedCssScene = cssScene;
+  savedWorldPosition = position;
+
   const tvWorldGroup = new THREE.Group();
   tvWorldGroup.position.set(position.x, 0, position.z);
 
@@ -148,6 +221,9 @@ export function createTVWorld(scene, createFloatingText, position) {
   sign.position.set(-8, 9, 0);
   tvWorldGroup.add(sign);
 
+  // Floating remote in the middle of TV World.
+  addFloatingRemote(tvWorldGroup);
+
   const tvTheaters = [];
 
   tvShowData.forEach((genre) => {
@@ -156,6 +232,12 @@ export function createTVWorld(scene, createFloatingText, position) {
     const z = Math.sin(genre.angle) * radius;
 
     const station = createTVTheater(genre, x, z, createFloatingText);
+
+    savedTVStations[genre.name] = {
+      x,
+      z,
+      genre
+    };
 
     tvTheaters.push({
       group: station.group,
@@ -167,6 +249,7 @@ export function createTVWorld(scene, createFloatingText, position) {
   });
 
   addTVDecorations(tvWorldGroup);
+  startRemoteAnimation();
 
   scene.add(tvWorldGroup);
 
@@ -187,49 +270,399 @@ function createTVTheater(genre, x, z, createFloatingText) {
   group.lookAt(0, 0, 0);
 
   const base = new THREE.Mesh(
-    new THREE.BoxGeometry(8, 0.5, 5),
+    new THREE.CylinderGeometry(5.5, 5.5, 0.45, 40),
     new THREE.MeshStandardMaterial({
-      color: "#101010"
+      color: "#101010",
+      roughness: 0.7
     })
   );
-  base.position.y = 0.25;
+  base.position.y = 0.22;
   group.add(base);
 
-  const tvFrame = new THREE.Mesh(
+  const glowPlatform = new THREE.Mesh(
+    new THREE.CircleGeometry(5.7, 40),
+    new THREE.MeshStandardMaterial({
+      color: genre.color,
+      emissive: genre.color,
+      emissiveIntensity: 0.35,
+      transparent: true,
+      opacity: 0.18
+    })
+  );
+  glowPlatform.rotation.x = -Math.PI / 2;
+  glowPlatform.position.y = 0.05;
+  group.add(glowPlatform);
+
+  addTVModel(group, genre);
+  addCouchModel(group, genre);
+
+  const sign = createFloatingText(genre.name, genre.color);
+  sign.position.set(-3.4, 5.9, -2.1);
+  group.add(sign);
+
+  return {
+    group
+  };
+}
+
+// ===============================
+// ADD 3D TV MODEL
+// ===============================
+
+function addTVModel(group, genre) {
+  const tvHolder = new THREE.Group();
+
+  tvHolder.position.copy(TV_MODEL_POSITION);
+
+  group.add(tvHolder);
+
+  loadTVModel()
+    .then((gltf) => {
+      const tv = gltf.scene.clone(true);
+
+      centerModel(tv);
+      tv.scale.copy(TV_MODEL_SCALE);
+
+      tv.traverse((child) => {
+        if (child.isMesh) {
+          child.castShadow = false;
+          child.receiveShadow = false;
+        }
+      });
+
+      tvHolder.add(tv);
+
+      console.log(`${genre.name} TV model loaded.`);
+    })
+    .catch((error) => {
+      console.log(`${genre.name} TV model could not load. Backup TV added.`, error);
+
+      const backupTV = createBackupTV(genre.color);
+      tvHolder.add(backupTV);
+    });
+}
+
+// ===============================
+// ADD COUCH MODEL
+// ===============================
+
+function addCouchModel(group, genre) {
+  const couchHolder = new THREE.Group();
+
+  couchHolder.position.copy(COUCH_MODEL_POSITION);
+  couchHolder.rotation.y = Math.PI;
+
+  group.add(couchHolder);
+
+  loadCouchModel()
+    .then((gltf) => {
+      const couch = gltf.scene.clone(true);
+
+      centerModel(couch);
+      couch.scale.copy(COUCH_MODEL_SCALE);
+
+      couch.traverse((child) => {
+        if (child.isMesh) {
+          child.castShadow = false;
+          child.receiveShadow = false;
+        }
+      });
+
+      couchHolder.add(couch);
+
+      console.log(`${genre.name} couch loaded.`);
+    })
+    .catch((error) => {
+      console.log(`${genre.name} couch model could not load. Backup couch added.`, error);
+
+      const backupCouch = createBackupCouch();
+      couchHolder.add(backupCouch);
+    });
+}
+
+// ===============================
+// ADD FLOATING REMOTE
+// ===============================
+
+function addFloatingRemote(group) {
+  remoteHolder = new THREE.Group();
+
+  remoteHolder.position.copy(REMOTE_MODEL_POSITION);
+  remoteHolder.rotation.set(
+    REMOTE_MODEL_ROTATION.x,
+    REMOTE_MODEL_ROTATION.y,
+    REMOTE_MODEL_ROTATION.z
+  );
+
+  group.add(remoteHolder);
+
+  loadRemoteModel()
+    .then((gltf) => {
+      const remote = gltf.scene.clone(true);
+
+      centerModel(remote);
+      remote.scale.copy(REMOTE_MODEL_SCALE);
+
+      remote.traverse((child) => {
+        if (child.isMesh) {
+          child.castShadow = false;
+          child.receiveShadow = false;
+        }
+      });
+
+      remoteHolder.add(remote);
+
+      console.log("Floating remote loaded.");
+    })
+    .catch((error) => {
+      console.log("Remote model could not load. Backup remote added.", error);
+
+      const backupRemote = createBackupRemote();
+      remoteHolder.add(backupRemote);
+    });
+}
+
+// ===============================
+// TV SCREEN VIDEO FUNCTIONS
+// ===============================
+
+export function updateTVScreenVideo(genre) {
+  if (!savedCssScene || !savedWorldPosition) return;
+  if (!genre) return;
+
+  if (activeTVGenreName === genre.name) return;
+
+  clearTVScreenVideo();
+
+  const stationData = savedTVStations[genre.name];
+
+  if (!stationData) return;
+
+  activeTVScreenGroup = createTVIframeScreen(
+    genre,
+    stationData.x,
+    stationData.z,
+    savedWorldPosition
+  );
+
+  savedCssScene.add(activeTVScreenGroup);
+  activeTVGenreName = genre.name;
+}
+
+export function clearTVScreenVideo() {
+  if (!activeTVScreenGroup || !savedCssScene) return;
+
+  activeTVScreenGroup.traverse((child) => {
+    if (child.element && child.element.tagName === "IFRAME") {
+      child.element.src = "";
+      child.element.remove();
+    }
+  });
+
+  savedCssScene.remove(activeTVScreenGroup);
+
+  activeTVScreenGroup = null;
+  activeTVGenreName = null;
+}
+
+function createTVIframeScreen(genre, x, z, worldPosition) {
+  const iframe = document.createElement("iframe");
+
+  iframe.src = makeYoutubeScreenUrl(genre.shows[0].trailer);
+  iframe.width = "640";
+  iframe.height = "360";
+  iframe.allow = "autoplay; encrypted-media; picture-in-picture";
+  iframe.className = "tvWorldIframe";
+
+  iframe.style.border = "0";
+  iframe.style.borderRadius = "12px";
+  iframe.style.background = "black";
+  iframe.style.pointerEvents = "none";
+
+  const screenObject = new CSS3DObject(iframe);
+
+  screenObject.scale.set(
+    TV_YOUTUBE_SCREEN_WIDTH / 640,
+    TV_YOUTUBE_SCREEN_HEIGHT / 360,
+    1
+  );
+
+  const cssStationGroup = new THREE.Group();
+
+  cssStationGroup.position.set(
+    worldPosition.x + x,
+    0,
+    worldPosition.z + z
+  );
+
+  cssStationGroup.lookAt(worldPosition.x, 0, worldPosition.z);
+
+  screenObject.position.copy(TV_YOUTUBE_SCREEN_POSITION);
+  screenObject.rotation.y = 0;
+
+  cssStationGroup.add(screenObject);
+
+  return cssStationGroup;
+}
+
+function makeYoutubeScreenUrl(url) {
+  return `${url}?autoplay=1&mute=0&controls=0&rel=0&modestbranding=1&playsinline=1`;
+}
+
+// ===============================
+// LOAD MODELS ONCE
+// ===============================
+
+function loadTVModel() {
+  if (tvModelPromise) return tvModelPromise;
+
+  const loader = new GLTFLoader();
+
+  tvModelPromise = new Promise((resolve, reject) => {
+    loader.load(
+      TV_MODEL_PATH,
+      (gltf) => resolve(gltf),
+      undefined,
+      (error) => reject(error)
+    );
+  });
+
+  return tvModelPromise;
+}
+
+function loadRemoteModel() {
+  if (remoteModelPromise) return remoteModelPromise;
+
+  const loader = new GLTFLoader();
+
+  remoteModelPromise = new Promise((resolve, reject) => {
+    loader.load(
+      REMOTE_MODEL_PATH,
+      (gltf) => resolve(gltf),
+      undefined,
+      (error) => reject(error)
+    );
+  });
+
+  return remoteModelPromise;
+}
+
+function loadCouchModel() {
+  if (couchModelPromise) return couchModelPromise;
+
+  const loader = new GLTFLoader();
+
+  couchModelPromise = new Promise((resolve, reject) => {
+    loader.load(
+      COUCH_MODEL_PATH,
+      (gltf) => resolve(gltf),
+      undefined,
+      (error) => reject(error)
+    );
+  });
+
+  return couchModelPromise;
+}
+
+// ===============================
+// REMOTE ANIMATION
+// ===============================
+
+function startRemoteAnimation() {
+  if (remoteAnimationStarted) return;
+
+  remoteAnimationStarted = true;
+
+  function animateRemote() {
+    requestAnimationFrame(animateRemote);
+
+    if (!remoteHolder) return;
+
+    const time = performance.now() * 0.001;
+
+    remoteHolder.position.y =
+      REMOTE_MODEL_POSITION.y + Math.sin(time * 1.5) * 0.25;
+
+    remoteHolder.rotation.y += 0.01;
+  }
+
+  animateRemote();
+}
+
+// ===============================
+// BACKUP MODELS
+// ===============================
+
+function createBackupTV(color) {
+  const tv = new THREE.Group();
+
+  const frame = new THREE.Mesh(
     new THREE.BoxGeometry(7.5, 4.5, 0.5),
     new THREE.MeshStandardMaterial({
       color: "#050505",
       roughness: 0.45
     })
   );
-  tvFrame.position.set(0, 3.2, -2);
-  group.add(tvFrame);
+  frame.position.set(0, 3.2, -2);
+  tv.add(frame);
 
-  const tvScreen = new THREE.Mesh(
+  const screen = new THREE.Mesh(
     new THREE.PlaneGeometry(6.6, 3.5),
     new THREE.MeshBasicMaterial({
-      color: genre.color
+      color: color
     })
   );
-  tvScreen.position.set(0, 3.2, -2.28);
-  group.add(tvScreen);
+  screen.position.set(0, 3.2, -2.28);
+  tv.add(screen);
 
-  const tvStand = new THREE.Mesh(
+  const stand = new THREE.Mesh(
     new THREE.BoxGeometry(1.5, 1.5, 0.3),
     new THREE.MeshStandardMaterial({
       color: "#222222"
     })
   );
-  tvStand.position.set(0, 1.2, -2);
-  group.add(tvStand);
+  stand.position.set(0, 1.2, -2);
+  tv.add(stand);
 
-  const sign = createFloatingText(genre.name, genre.color);
-  sign.position.set(-3.2, 5.9, -2.1);
-  group.add(sign);
+  return tv;
+}
 
-  return {
-    group
-  };
+function createBackupCouch() {
+  const couch = new THREE.Group();
+
+  const seat = new THREE.Mesh(
+    new THREE.BoxGeometry(5, 0.7, 1.8),
+    new THREE.MeshStandardMaterial({
+      color: "#222222",
+      roughness: 0.65
+    })
+  );
+  seat.position.y = 0.6;
+  couch.add(seat);
+
+  const back = new THREE.Mesh(
+    new THREE.BoxGeometry(5, 1.8, 0.5),
+    new THREE.MeshStandardMaterial({
+      color: "#111111",
+      roughness: 0.65
+    })
+  );
+  back.position.set(0, 1.25, -0.75);
+  couch.add(back);
+
+  return couch;
+}
+
+function createBackupRemote() {
+  const remote = new THREE.Mesh(
+    new THREE.BoxGeometry(1, 0.18, 3),
+    new THREE.MeshStandardMaterial({
+      color: "#111111",
+      roughness: 0.55
+    })
+  );
+
+  return remote;
 }
 
 // ===============================
@@ -259,4 +692,19 @@ function addTVDecorations(group) {
 
     group.add(tower);
   }
+}
+
+// ===============================
+// HELPER FUNCTIONS
+// ===============================
+
+function centerModel(model) {
+  const box = new THREE.Box3().setFromObject(model);
+  const center = new THREE.Vector3();
+
+  box.getCenter(center);
+
+  model.position.x -= center.x;
+  model.position.z -= center.z;
+  model.position.y -= box.min.y;
 }

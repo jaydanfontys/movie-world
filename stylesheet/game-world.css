@@ -95,6 +95,26 @@
   background: black;
 }
 
+/* ===============================
+   CSS3D YOUTUBE SCREENS
+   =============================== */
+
+/* 
+   These iframe screens are the videos that appear on the 3D monitors.
+   The actual positioning is mostly controlled inside gameworld.js.
+*/
+
+.gameMonitorIframe {
+  border: 0;
+  border-radius: 14px;
+  background: black;
+  box-shadow: 0 0 24px rgba(128, 237, 153, 0.35);
+}
+
+/* ===============================
+   RESPONSIVE GAME PANEL
+   =============================== */
+
 @media (max-width: 800px) {
   #gamePanel {
     left: 20px;

@@ -6,6 +6,8 @@ var THREE = _interopRequireWildcard(require("three"));
 
 var _GLTFLoader = require("three/addons/loaders/GLTFLoader.js");
 
+var _CSS3DRenderer = require("three/addons/renderers/CSS3DRenderer.js");
+
 var _hubworld = require("./hubworld.js");
 
 var _movieworld = require("./movieworld.js");
@@ -31,22 +33,61 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 var canvas = document.querySelector("#world"); // The scene is the full 3D world.
 
 var scene = new THREE.Scene();
-scene.background = new THREE.Color("#080812"); // This is the camera the player looks through.
+scene.background = new THREE.Color("#080812"); // This scene is only for the YouTube iframe screens.
 
-var camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 1000); // This draws the 3D world on the canvas.
+var cssScene = new THREE.Scene(); // This is the camera the player looks through.
+
+var camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 1000);
+var clock = new THREE.Clock();
+var MAX_PIXEL_RATIO = 1.0; // This fixes the visibilitychange code below.
+
+var lastRenderTime = performance.now(); // This draws the normal 3D world.
 
 var renderer = new THREE.WebGLRenderer({
   canvas: canvas,
-  antialias: true
+  antialias: false
 });
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // ===============================
+renderer.setSize(window.innerWidth, window.innerHeight); // Lower pixel ratio helps performance on slower devices.
+
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, MAX_PIXEL_RATIO)); // Keep the normal canvas behind the CSS3D video layer.
+
+renderer.domElement.style.position = "fixed";
+renderer.domElement.style.top = "0";
+renderer.domElement.style.left = "0";
+renderer.domElement.style.zIndex = "1"; // This draws the YouTube iframe screens in the 3D world.
+
+var cssRenderer = new _CSS3DRenderer.CSS3DRenderer();
+cssRenderer.setSize(window.innerWidth, window.innerHeight);
+cssRenderer.domElement.style.position = "fixed";
+cssRenderer.domElement.style.top = "0";
+cssRenderer.domElement.style.left = "0";
+cssRenderer.domElement.style.width = "100%";
+cssRenderer.domElement.style.height = "100%";
+cssRenderer.domElement.style.pointerEvents = "none";
+cssRenderer.domElement.style.zIndex = "2";
+document.body.appendChild(cssRenderer.domElement);
+document.addEventListener("visibilitychange", function () {
+  if (document.hidden) {
+    lastRenderTime = performance.now();
+  }
+}); // ===============================
 // 2. HTML ELEMENTS
 // ===============================
 // Start screen
 
 var startScreen = document.querySelector("#startScreen");
-var startBtn = document.querySelector("#startBtn"); // Movie panel
+var startBtn = document.querySelector("#startBtn");
+var exploreBtn = document.querySelector("#exploreBtn"); // Mini-game selection and HUD
+
+var miniGameButtons = document.querySelectorAll(".miniGameCard");
+var miniGameHud = document.querySelector("#miniGameHud");
+var miniGameTitle = document.querySelector("#miniGameTitle");
+var miniGameGoal = document.querySelector("#miniGameGoal");
+var playerScoreText = document.querySelector("#playerScoreText");
+var computerScoreText = document.querySelector("#computerScoreText");
+var miniGameTimerText = document.querySelector("#miniGameTimerText");
+var miniGameMessage = document.querySelector("#miniGameMessage");
+var worldWelcomeText = document.querySelector("#worldWelcomeText"); // Movie panel
 
 var moviePanel = document.querySelector("#moviePanel");
 var closePanel = document.querySelector("#closePanel");
@@ -93,19 +134,44 @@ var mobileBrake = document.querySelector("#mobileBrake"); // ===================
 
 var keys = {};
 var speed = 0;
-var rotationSpeed = 0;
 var currentStation = null;
-var gameStarted = false; // Mobile joystick values
+var gameStarted = false;
+var selectedMiniGameKey = "checkpointSprint";
+var computerCar = null;
+var lastWelcomedWorld = "hub";
+var welcomeMessageTimeout = null; // ===============================
+// CAR SOUND + E-BOOST VARIABLES
+// ===============================
+// Make sure these files exist inside your audio folder:
+// audio/car-engine-loop.mp3
+// audio/boost.mp3
+
+var carEngineAudio = new Audio("audio/car-engine-loop.mp3");
+carEngineAudio.loop = true;
+carEngineAudio.volume = 0;
+var boostAudio = new Audio("audio/boost.mp3");
+boostAudio.volume = 0.7; // Optional background music.
+// Put a file here if you want it to play:
+// audio/background-music.mp3
+
+var backgroundMusicAudio = new Audio("audio/background-music.mp3");
+backgroundMusicAudio.loop = true;
+backgroundMusicAudio.volume = 0.18;
+var boostActive = false;
+var boostCooldown = false;
+var BOOST_DURATION = 900;
+var BOOST_COOLDOWN = 1800;
+var NORMAL_MAX_SPEED = 0.32;
+var BOOST_MAX_SPEED = 0.62; // Mobile joystick values
 
 var joystickForward = 0;
 var joystickTurn = 0;
-var mobileBrakePressed = false; // The car is now a group that holds the selected car.
+var mobileBrakePressed = false; // The car is a group that holds the selected car.
 
 var car = null;
 var activeCarModel = null; // These buttons come from the car selection cards in index.html.
 
 var carModelButtons = document.querySelectorAll(".carModelCard"); // This car system supports both simple block cars and 3D model cars.
-// For user testing, the block cars are safer on phones.
 
 var CAR_OPTIONS = {
   redBlock: {
@@ -142,12 +208,56 @@ var CAR_OPTIONS = {
 }; // Default car for user testing.
 
 var selectedCarKey = "redBlock"; // ===============================
+// MINI-GAME SETTINGS
+// ===============================
+
+var MINI_GAMES = {
+  checkpointSprint: {
+    title: "Checkpoint Sprint",
+    goal: "Drive through 5 glowing checkpoints before the computer wins.",
+    objectType: "checkpoint",
+    targetCount: 5,
+    duration: 30,
+    color: "#7cc7ff"
+  },
+  coinRush: {
+    title: "Coin Rush",
+    goal: "Collect 10 glowing coins around the central hub.",
+    objectType: "coin",
+    targetCount: 10,
+    duration: 30,
+    color: "#ffcc66"
+  },
+  popcornDash: {
+    title: "Popcorn Dash",
+    goal: "Collect 6 popcorn pickups before the computer gets them.",
+    objectType: "popcorn",
+    targetCount: 6,
+    duration: 30,
+    color: "#ff8ee8"
+  },
+  neonDrift: {
+    title: "Neon Drift",
+    goal: "Drive through 8 neon rings and keep your speed up.",
+    objectType: "ring",
+    targetCount: 8,
+    duration: 30,
+    color: "#80ed99"
+  }
+};
+var miniGameState = {
+  active: false,
+  finished: false,
+  objects: [],
+  playerScore: 0,
+  computerScore: 0,
+  timeLeft: 0,
+  computerTimer: 0,
+  computerNextPointTime: 2.8,
+  message: ""
+}; // ===============================
 // 4. WORLD POSITIONS
 // ===============================
-// These are the positions of all worlds.
-// x = left/right position
-// z = forward/backward position
-// radius = playable circle size
 
 var WORLD_POSITIONS = {
   hub: {
@@ -181,7 +291,6 @@ var WORLD_POSITIONS = {
     radius: 55
   }
 }; // These are the bridges the car is allowed to drive on.
-// The same list is used for bridge collision, so the car does not hit invisible walls.
 
 var BRIDGE_CONNECTIONS = [["hub", "movie"], ["hub", "tv"], ["hub", "game"], ["hub", "music"], ["hub", "anime"], ["movie", "tv"], ["tv", "game"], ["game", "music"], ["music", "anime"], ["anime", "movie"]]; // ===============================
 // 5. CAR SELECTION
@@ -202,19 +311,71 @@ carModelButtons.forEach(function (button) {
       loadSelectedCar();
     }
   });
+});
+miniGameButtons.forEach(function (button) {
+  button.addEventListener("click", function () {
+    var miniGameKey = button.dataset.minigame;
+    if (!MINI_GAMES[miniGameKey]) return;
+    selectedMiniGameKey = miniGameKey;
+    miniGameButtons.forEach(function (btn) {
+      btn.classList.remove("selected");
+    });
+    button.classList.add("selected");
+  });
 }); // ===============================
 // 6. BUTTONS AND KEYBOARD
 // ===============================
 
 if (startBtn) {
   startBtn.addEventListener("click", function () {
-    if (startScreen) {
-      startScreen.style.display = "none";
+    startExperience(true);
+  });
+}
+
+if (exploreBtn) {
+  exploreBtn.addEventListener("click", function () {
+    startExperience(false);
+  });
+}
+
+function startExperience(shouldStartMiniGame) {
+  if (startScreen) {
+    startScreen.style.display = "none";
+  }
+
+  gameStarted = true; // Start engine sound after the player clicks Start.
+  // Browsers allow audio better after a real click.
+
+  carEngineAudio.play()["catch"](function (error) {
+    console.log("Car engine sound could not start yet.", error);
+  }); // Optional background music.
+
+  backgroundMusicAudio.play()["catch"](function (error) {
+    console.log("Background music could not start. Add audio/background-music.mp3 if you want music.", error);
+  });
+
+  if (shouldStartMiniGame) {
+    startSelectedMiniGame();
+    showWorldWelcome("Welcome to Video Entertainment Drive! Mini-game started.");
+    speakText("Welcome to Video Entertainment Drive. Mini-game started.");
+  } else {
+    clearMiniGameObjects();
+    miniGameState.active = false;
+    miniGameState.finished = true;
+
+    if (miniGameHud) {
+      miniGameHud.classList.add("hidden");
     }
 
-    gameStarted = true;
-    console.log("Game started");
-  });
+    if (computerCar) {
+      computerCar.visible = false;
+    }
+
+    showWorldWelcome("Welcome to Video Entertainment Drive! Explore freely.");
+    speakText("Welcome to Video Entertainment Drive. Explore freely.");
+  }
+
+  console.log("Game started");
 }
 
 if (closePanel) {
@@ -239,13 +400,42 @@ if (closeAnimePanel) {
 
 
 window.addEventListener("keydown", function (event) {
-  keys[event.key.toLowerCase()] = true;
+  keys[event.key.toLowerCase()] = true; // Spacebar = E-Boost
+
+  if (event.code === "Space") {
+    event.preventDefault();
+    activateBoost();
+  }
 });
 window.addEventListener("keyup", function (event) {
   keys[event.key.toLowerCase()] = false;
 }); // ===============================
+// E-BOOST
+// ===============================
+
+function activateBoost() {
+  if (!gameStarted) return;
+  if (boostActive) return;
+  if (boostCooldown) return;
+  boostActive = true;
+  boostCooldown = true;
+  speed += 0.18;
+  boostAudio.currentTime = 0;
+  boostAudio.play()["catch"](function (error) {
+    console.log("Boost sound could not play.", error);
+  });
+  console.log("E-Boost activated!");
+  setTimeout(function () {
+    boostActive = false;
+  }, BOOST_DURATION);
+  setTimeout(function () {
+    boostCooldown = false;
+    console.log("E-Boost ready again.");
+  }, BOOST_COOLDOWN);
+} // ===============================
 // 7. MOBILE JOYSTICK CONTROLS
 // ===============================
+
 
 var joystickActive = false;
 var joystickCenterX = 0;
@@ -295,9 +485,7 @@ function updateJoystick(event) {
   var angle = Math.atan2(deltaY, deltaX);
   var knobX = Math.cos(angle) * distance;
   var knobY = Math.sin(angle) * distance;
-  joystickKnob.style.transform = "translate(calc(-50% + ".concat(knobX, "px), calc(-50% + ").concat(knobY, "px))"); // Left and right steering.
-  // We make right negative and left positive because the car rotation uses:
-  // positive = left, negative = right.
+  joystickKnob.style.transform = "translate(calc(-50% + ".concat(knobX, "px), calc(-50% + ").concat(knobY, "px))"); // Right is negative and left is positive.
 
   joystickTurn = -knobX / joystickMaxDistance; // Up moves forward. Down reverses.
 
@@ -328,16 +516,18 @@ scene.add(moonLight); // ===============================
 
 var hubWorld = (0, _hubworld.createHubWorld)(scene, createFloatingText, WORLD_POSITIONS.hub); // Movie World
 
-var movieWorld = (0, _movieworld.createMovieWorld)(scene, createFloatingText, WORLD_POSITIONS.movie);
+var movieWorld = (0, _movieworld.createMovieWorld)(scene, cssScene, createFloatingText, WORLD_POSITIONS.movie);
 var movieStations = movieWorld.movieStations; // TV World
+// This receives cssScene so the YouTube video can appear on the 3D TV screen.
 
-var tvWorld = (0, _tvworld.createTVWorld)(scene, createFloatingText, WORLD_POSITIONS.tv);
+var tvWorld = (0, _tvworld.createTVWorld)(scene, cssScene, createFloatingText, WORLD_POSITIONS.tv);
 var tvTheaters = tvWorld.tvTheaters; // Music World
 
 var musicWorld = (0, _musicworld.createMusicWorld)(scene, createFloatingText, WORLD_POSITIONS.music);
 var musicStations = musicWorld.musicStations; // Game World
+// This receives cssScene so it can create one active YouTube screen only when needed.
 
-var gameWorld = (0, _gameworld.createGameWorld)(scene, createFloatingText, WORLD_POSITIONS.game);
+var gameWorld = (0, _gameworld.createGameWorld)(scene, cssScene, createFloatingText, WORLD_POSITIONS.game);
 var gameStations = gameWorld.gameStations; // Anime World
 
 var animeWorld = (0, _animeworld.createAnimeWorld)(scene, createFloatingText, WORLD_POSITIONS.anime);
@@ -359,7 +549,6 @@ createBridgeBetween(WORLD_POSITIONS.music, WORLD_POSITIONS.anime, "#ff6b6b", "AN
 createBridgeBetween(WORLD_POSITIONS.anime, WORLD_POSITIONS.movie, "#ffcc66", "MOVIES"); // ===============================
 // 11. ENVIRONMENT
 // ===============================
-// You removed the pine trees, so I did not add them back.
 
 addStars(); // ===============================
 // 12. PLAYER CAR
@@ -369,7 +558,13 @@ car = createCar();
 scene.add(car); // Start the player in the central hub.
 
 car.position.set(0, 0.45, 18);
-car.rotation.y = Math.PI; // Camera starting position
+car.rotation.y = Math.PI; // Computer car for mini-games.
+
+computerCar = createComputerCar();
+computerCar.position.set(6, 0.45, 18);
+computerCar.rotation.y = Math.PI;
+computerCar.visible = false;
+scene.add(computerCar); // Camera starting position
 
 camera.position.set(0, 16, 34);
 camera.lookAt(car.position); // ===============================
@@ -379,14 +574,11 @@ camera.lookAt(car.position); // ===============================
 function createBridgeBetween(startWorld, endWorld, color, label) {
   var start = new THREE.Vector3(startWorld.x, 0, startWorld.z);
   var end = new THREE.Vector3(endWorld.x, 0, endWorld.z);
-  var direction = new THREE.Vector3().subVectors(end, start).normalize(); // This makes the bridge start at the edge of one world
-  // and end at the edge of the next world.
-
+  var direction = new THREE.Vector3().subVectors(end, start).normalize();
   var bridgeStart = start.clone().add(direction.clone().multiplyScalar(startWorld.radius - 2));
   var bridgeEnd = end.clone().add(direction.clone().multiplyScalar(-(endWorld.radius - 2)));
   var center = new THREE.Vector3().addVectors(bridgeStart, bridgeEnd).multiplyScalar(0.5);
-  var length = bridgeStart.distanceTo(bridgeEnd); // Rotate the bridge so it points toward the next world.
-
+  var length = bridgeStart.distanceTo(bridgeEnd);
   var angle = Math.atan2(direction.x, direction.z);
   var bridgeGroup = new THREE.Group();
   bridgeGroup.position.set(center.x, 0, center.z);
@@ -422,8 +614,7 @@ function createBridgeBetween(startWorld, endWorld, color, label) {
 
 
 function createCar() {
-  var group = new THREE.Group(); // Load the selected car into this group.
-
+  var group = new THREE.Group();
   loadSelectedCar(group);
   return group;
 }
@@ -453,25 +644,20 @@ function loadSelectedCar() {
 function loadSelectedCarModel(targetCarGroup, selectedCar) {
   var loader = new _GLTFLoader.GLTFLoader();
   loader.load(selectedCar.path, function (gltf) {
-    activeCarModel = gltf.scene; // Put the model inside a wrapper so we can center and scale it properly.
-
+    activeCarModel = gltf.scene;
     var modelWrapper = new THREE.Group();
-    modelWrapper.add(activeCarModel); // Calculate the size and center of the model.
-
+    modelWrapper.add(activeCarModel);
     var box = new THREE.Box3().setFromObject(activeCarModel);
     var size = new THREE.Vector3();
     var center = new THREE.Vector3();
     box.getSize(size);
-    box.getCenter(center); // Move the model so its center is inside the car group.
-
+    box.getCenter(center);
     activeCarModel.position.x -= center.x;
     activeCarModel.position.y -= box.min.y;
-    activeCarModel.position.z -= center.z; // Automatically scale the car to a good size.
-
+    activeCarModel.position.z -= center.z;
     var currentLength = Math.max(size.x, size.z);
     var scaleFactor = selectedCar.targetLength / currentLength;
-    modelWrapper.scale.set(scaleFactor, scaleFactor, scaleFactor); // Rotate the car so it faces the correct driving direction.
-
+    modelWrapper.scale.set(scaleFactor, scaleFactor, scaleFactor);
     modelWrapper.rotation.y = selectedCar.rotationY;
     targetCarGroup.add(modelWrapper);
     console.log("".concat(selectedCar.name, " loaded."));
@@ -539,6 +725,16 @@ function createBasicCar(color) {
   rightBackLight.position.x = 0.6;
   group.add(rightBackLight);
   return group;
+}
+
+function createComputerCar() {
+  var group = createBasicCar("#7cc7ff");
+  group.scale.set(0.9, 0.9, 0.9);
+  var label = createFloatingText("CPU", "#7cc7ff");
+  label.position.set(-1.5, 3.2, 0);
+  label.scale.set(3.2, 0.9, 1);
+  group.add(label);
+  return group;
 } // ===============================
 // 15. FLOATING TEXT
 // ===============================
@@ -586,472 +782,239 @@ function addStars() {
   }));
   scene.add(stars);
 } // ===============================
-// 17. CAR MOVEMENT
+// 17. MINI-GAME SYSTEM
 // ===============================
 
 
-function updateCarMovement() {
-  if (!gameStarted) return;
-  var forwardPressed = keys["w"] || keys["arrowup"];
-  var backwardPressed = keys["s"] || keys["arrowdown"];
-  var leftPressed = keys["a"] || keys["arrowleft"];
-  var rightPressed = keys["d"] || keys["arrowright"];
-  var forwardInput = 0;
-  var turnInput = 0; // Keyboard input
+function startSelectedMiniGame() {
+  var selectedMiniGame = MINI_GAMES[selectedMiniGameKey];
+  if (!selectedMiniGame) return;
+  clearMiniGameObjects();
+  miniGameState.active = true;
+  miniGameState.finished = false;
+  miniGameState.playerScore = 0;
+  miniGameState.computerScore = 0;
+  miniGameState.timeLeft = selectedMiniGame.duration;
+  miniGameState.computerTimer = 0;
+  miniGameState.computerNextPointTime = 2.4;
+  miniGameState.message = "Go!";
 
-  if (forwardPressed) {
-    forwardInput += 1;
+  if (computerCar) {
+    computerCar.visible = true;
+    computerCar.position.set(6, 0.45, 18);
+    computerCar.rotation.y = Math.PI;
   }
 
-  if (backwardPressed) {
-    forwardInput -= 1;
+  createMiniGameObjects(selectedMiniGame);
+  updateMiniGameHud();
+
+  if (miniGameHud) {
+    miniGameHud.classList.remove("hidden");
   }
+}
 
-  if (leftPressed) {
-    turnInput += 1;
+function createMiniGameObjects(selectedMiniGame) {
+  for (var i = 0; i < selectedMiniGame.targetCount; i++) {
+    var angle = i / selectedMiniGame.targetCount * Math.PI * 2;
+    var radius = 24 + i % 2 * 8;
+    var x = Math.cos(angle) * radius;
+    var z = Math.sin(angle) * radius;
+    var object = createMiniGameObject(selectedMiniGame, i);
+    object.position.set(x, 1, z);
+    object.userData.collected = false;
+    object.userData.index = i;
+    scene.add(object);
+    miniGameState.objects.push(object);
   }
+}
 
-  if (rightPressed) {
-    turnInput -= 1;
-  } // Mobile joystick input
+function createMiniGameObject(selectedMiniGame, index) {
+  var color = selectedMiniGame.color;
+  var group = new THREE.Group();
 
-
-  forwardInput += joystickForward;
-  turnInput += joystickTurn;
-  forwardInput = THREE.MathUtils.clamp(forwardInput, -1, 1);
-  turnInput = THREE.MathUtils.clamp(turnInput, -1, 1);
-
-  if (forwardInput > 0.05) {
-    speed += 0.015 * forwardInput;
-  } else if (forwardInput < -0.05) {
-    speed += 0.012 * forwardInput;
+  if (selectedMiniGame.objectType === "checkpoint") {
+    var ring = new THREE.Mesh(new THREE.TorusGeometry(1.8, 0.12, 16, 48), new THREE.MeshStandardMaterial({
+      color: color,
+      emissive: color,
+      emissiveIntensity: 1.1
+    }));
+    ring.rotation.y = Math.PI / 2;
+    group.add(ring);
+    var number = createFloatingText("".concat(index + 1), color);
+    number.position.set(-0.8, 1.8, 0);
+    number.scale.set(2.2, 0.7, 1);
+    group.add(number);
+  } else if (selectedMiniGame.objectType === "coin") {
+    var coin = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 0.18, 40), new THREE.MeshStandardMaterial({
+      color: color,
+      emissive: color,
+      emissiveIntensity: 1,
+      roughness: 0.35
+    }));
+    coin.rotation.x = Math.PI / 2;
+    group.add(coin);
+  } else if (selectedMiniGame.objectType === "popcorn") {
+    var bucket = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 0.6, 1.2, 20), new THREE.MeshStandardMaterial({
+      color: "#ff4d4d",
+      emissive: "#ff4d4d",
+      emissiveIntensity: 0.45
+    }));
+    bucket.position.y = 0.3;
+    group.add(bucket);
+    var popcornTop = new THREE.Mesh(new THREE.SphereGeometry(0.75, 16, 16), new THREE.MeshStandardMaterial({
+      color: "#fff3b0",
+      emissive: "#fff3b0",
+      emissiveIntensity: 0.55
+    }));
+    popcornTop.position.y = 1;
+    group.add(popcornTop);
   } else {
-    speed *= 0.94;
+    var _ring = new THREE.Mesh(new THREE.TorusGeometry(1.6, 0.12, 16, 48), new THREE.MeshStandardMaterial({
+      color: color,
+      emissive: color,
+      emissiveIntensity: 1.2
+    }));
+
+    _ring.rotation.x = Math.PI / 2;
+    group.add(_ring);
   }
 
-  if (mobileBrakePressed) {
-    speed *= 0.82;
-  }
-
-  speed = THREE.MathUtils.clamp(speed, -0.18, 0.32);
-
-  if (Math.abs(speed) > 0.01) {
-    car.rotation.y += 0.04 * turnInput * Math.sign(speed);
-  } // Save old position first.
-  // If the car moves outside the world or bridge,
-  // it will be placed back here.
-
-
-  var previousX = car.position.x;
-  var previousZ = car.position.z;
-  car.position.x += Math.sin(car.rotation.y) * speed;
-  car.position.z += Math.cos(car.rotation.y) * speed;
-
-  if (!isCarInPlayableArea()) {
-    car.position.x = previousX;
-    car.position.z = previousZ;
-    speed *= -0.25;
-  }
-} // ===============================
-// 18. PLAYABLE AREA CHECK
-// ===============================
-
-
-function isCarInPlayableArea() {
-  var point = new THREE.Vector2(car.position.x, car.position.z); // Check if the car is inside one of the worlds.
-
-  var worldKeys = Object.keys(WORLD_POSITIONS);
-
-  for (var _i = 0, _worldKeys = worldKeys; _i < _worldKeys.length; _i++) {
-    var key = _worldKeys[_i];
-    var world = WORLD_POSITIONS[key];
-
-    if (isInsideCircle(point.x, point.y, world.x, world.z, world.radius)) {
-      return true;
-    }
-  } // Check if the car is on one of the bridges.
-
-
-  for (var _i2 = 0, _BRIDGE_CONNECTIONS = BRIDGE_CONNECTIONS; _i2 < _BRIDGE_CONNECTIONS.length; _i2++) {
-    var connection = _BRIDGE_CONNECTIONS[_i2];
-    var start = WORLD_POSITIONS[connection[0]];
-    var end = WORLD_POSITIONS[connection[1]];
-
-    if (isPointOnBridge(point, start, end)) {
-      return true;
-    }
-  }
-
-  return false;
+  var light = new THREE.PointLight(color, 1.2, 8);
+  light.position.y = 1.2;
+  group.add(light);
+  return group;
 }
 
-function isInsideCircle(x, z, centerX, centerZ, radius) {
-  var dx = x - centerX;
-  var dz = z - centerZ;
-  return Math.sqrt(dx * dx + dz * dz) <= radius;
+function clearMiniGameObjects() {
+  miniGameState.objects.forEach(function (object) {
+    scene.remove(object);
+  });
+  miniGameState.objects = [];
 }
 
-function isPointOnBridge(point, startWorld, endWorld) {
-  var start = new THREE.Vector2(startWorld.x, startWorld.z);
-  var end = new THREE.Vector2(endWorld.x, endWorld.z);
-  var direction = new THREE.Vector2().subVectors(end, start).normalize();
-  var bridgeStart = start.clone().add(direction.clone().multiplyScalar(startWorld.radius - 2));
-  var bridgeEnd = end.clone().add(direction.clone().multiplyScalar(-(endWorld.radius - 2)));
-  var bridgeVector = new THREE.Vector2().subVectors(bridgeEnd, bridgeStart);
-  var pointVector = new THREE.Vector2().subVectors(point, bridgeStart);
-  var bridgeLength = bridgeVector.length();
-  var bridgeDirection = bridgeVector.clone().normalize();
-  var distanceAlongBridge = pointVector.dot(bridgeDirection); // If the car is before the bridge start or after bridge end, it is not on the bridge.
+function updateMiniGame(deltaTime) {
+  if (!miniGameState.active || miniGameState.finished) return;
+  var selectedMiniGame = MINI_GAMES[selectedMiniGameKey];
+  miniGameState.timeLeft -= deltaTime;
+  miniGameState.computerTimer += deltaTime;
+  miniGameState.objects.forEach(function (object) {
+    if (object.userData.collected) return;
+    object.rotation.y += deltaTime * 1.5;
+    object.rotation.x += deltaTime * 0.6;
+    var distance = car.position.distanceTo(object.position);
 
-  if (distanceAlongBridge < 0 || distanceAlongBridge > bridgeLength) {
-    return false;
+    if (distance < 3) {
+      collectMiniGameObject(object);
+    }
+  });
+
+  if (miniGameState.computerTimer >= miniGameState.computerNextPointTime) {
+    miniGameState.computerTimer = 0;
+    miniGameState.computerScore += 1;
+    miniGameState.computerNextPointTime = randomBetween(2.3, 4.4);
+
+    if (computerCar) {
+      moveComputerCarToNextTarget();
+    }
   }
 
-  var closestPoint = bridgeStart.clone().add(bridgeDirection.clone().multiplyScalar(distanceAlongBridge));
-  var sideDistance = point.distanceTo(closestPoint); // This number is the bridge width for collision.
-  // Higher number = easier to drive on bridge.
+  if (miniGameState.timeLeft <= 0) {
+    finishMiniGame();
+  }
 
-  return sideDistance <= 7;
-} // ===============================
-// 19. CAMERA FOLLOW
-// ===============================
+  if (miniGameState.playerScore >= selectedMiniGame.targetCount || miniGameState.computerScore >= selectedMiniGame.targetCount) {
+    finishMiniGame();
+  }
 
+  updateMiniGameHud();
+}
 
-function updateCamera() {
-  var cameraOffset = new THREE.Vector3(-Math.sin(car.rotation.y) * 9, 6, -Math.cos(car.rotation.y) * 9);
-  var targetCameraPosition = car.position.clone().add(cameraOffset);
-  camera.position.lerp(targetCameraPosition, 0.08);
-  var lookTarget = car.position.clone();
-  lookTarget.y += 1.2;
-  camera.lookAt(lookTarget);
-} // ===============================
-// 20. STATION INTERACTION
-// ===============================
+function collectMiniGameObject(object) {
+  object.userData.collected = true;
+  object.visible = false;
+  miniGameState.playerScore += 1;
+  miniGameState.message = "Nice! Keep going.";
+  updateMiniGameHud();
+}
 
+function finishMiniGame() {
+  miniGameState.active = false;
+  miniGameState.finished = true;
+  var playerScore = miniGameState.playerScore;
+  var computerScore = miniGameState.computerScore;
 
-function checkStationDistance() {
-  var nearestMovie = getNearestStation(movieStations);
-  var nearestTV = getNearestStation(tvTheaters);
-  var nearestMusic = getNearestStation(musicStations);
-  var nearestGame = getNearestStation(gameStations);
-  var nearestAnime = getNearestStation(animeStations);
-
-  if (nearestMovie.station && nearestMovie.distance < 8) {
-    currentGenreText.textContent = "".concat(nearestMovie.station.genre.name, " Movie Theater");
-
-    if (currentStation !== nearestMovie.station) {
-      closeAllPanels();
-      openMoviePanel(nearestMovie.station.genre);
-      currentStation = nearestMovie.station;
-    }
-  } else if (nearestTV.station && nearestTV.distance < 8) {
-    currentGenreText.textContent = "".concat(nearestTV.station.genre.name, " TV Station");
-
-    if (currentStation !== nearestTV.station) {
-      closeAllPanels();
-      openTVPanel(nearestTV.station.genre);
-      currentStation = nearestTV.station;
-    }
-  } else if (nearestMusic.station && nearestMusic.distance < 8) {
-    currentGenreText.textContent = "".concat(nearestMusic.station.genre.name, " Music Stage");
-
-    if (currentStation !== nearestMusic.station) {
-      closeAllPanels();
-      openMusicPanel(nearestMusic.station.genre);
-      currentStation = nearestMusic.station;
-    }
-  } else if (nearestGame.station && nearestGame.distance < 8) {
-    currentGenreText.textContent = "".concat(nearestGame.station.genre.name, " Game Station");
-
-    if (currentStation !== nearestGame.station) {
-      closeAllPanels();
-      openGamePanel(nearestGame.station.genre);
-      currentStation = nearestGame.station;
-    }
-  } else if (nearestAnime.station && nearestAnime.distance < 8) {
-    currentGenreText.textContent = "".concat(nearestAnime.station.genre.name, " Station");
-
-    if (currentStation !== nearestAnime.station) {
-      closeAllPanels();
-      openAnimePanel(nearestAnime.station.genre);
-      currentStation = nearestAnime.station;
-    }
+  if (playerScore > computerScore) {
+    miniGameState.message = "You win! You beat the computer.";
+    showWorldWelcome("Mini-game complete: You win!");
+    speakText("Mini-game complete. You win.");
+  } else if (computerScore > playerScore) {
+    miniGameState.message = "Computer wins this time.";
+    showWorldWelcome("Mini-game complete: Computer wins!");
+    speakText("Mini-game complete. Computer wins this time.");
   } else {
-    closeAllPanels();
-    updateLocationText();
-    currentStation = null;
+    miniGameState.message = "Draw! That was close.";
+    showWorldWelcome("Mini-game complete: Draw!");
+    speakText("Mini-game complete. It is a draw.");
+  }
+
+  if (computerCar) {
+    computerCar.visible = false;
+  }
+
+  setTimeout(function () {
+    clearMiniGameObjects();
+  }, 1800);
+  updateMiniGameHud();
+}
+
+function updateMiniGameHud() {
+  var selectedMiniGame = MINI_GAMES[selectedMiniGameKey];
+  if (!selectedMiniGame) return;
+
+  if (miniGameTitle) {
+    miniGameTitle.textContent = selectedMiniGame.title;
+  }
+
+  if (miniGameGoal) {
+    miniGameGoal.textContent = selectedMiniGame.goal;
+  }
+
+  if (playerScoreText) {
+    playerScoreText.textContent = miniGameState.playerScore;
+  }
+
+  if (computerScoreText) {
+    computerScoreText.textContent = miniGameState.computerScore;
+  }
+
+  if (miniGameTimerText) {
+    miniGameTimerText.textContent = Math.max(0, Math.ceil(miniGameState.timeLeft));
+  }
+
+  if (miniGameMessage) {
+    miniGameMessage.textContent = miniGameState.message;
   }
 }
 
-function getNearestStation(stations) {
-  var nearestStation = null;
-  var nearestDistance = Infinity;
-  stations.forEach(function (station) {
-    var distance = car.position.distanceTo(station.trigger);
-
-    if (distance < nearestDistance) {
-      nearestDistance = distance;
-      nearestStation = station;
-    }
+function moveComputerCarToNextTarget() {
+  if (!computerCar || miniGameState.objects.length === 0) return;
+  var availableObjects = miniGameState.objects.filter(function (object) {
+    return !object.userData.collected && object.visible;
   });
-  return {
-    station: nearestStation,
-    distance: nearestDistance
-  };
+  if (availableObjects.length === 0) return;
+  var randomObject = availableObjects[Math.floor(Math.random() * availableObjects.length)];
+  var target = randomObject.position.clone();
+  target.y = 0.45;
+  computerCar.position.lerp(target, 0.45);
+  computerCar.lookAt(target.x, computerCar.position.y, target.z);
 }
 
-function updateLocationText() {
-  var x = car.position.x;
-  var z = car.position.z;
-
-  if (isInsideCircle(x, z, WORLD_POSITIONS.hub.x, WORLD_POSITIONS.hub.z, WORLD_POSITIONS.hub.radius)) {
-    currentGenreText.textContent = "Central Entertainment Hub";
-  } else if (isInsideCircle(x, z, WORLD_POSITIONS.movie.x, WORLD_POSITIONS.movie.z, WORLD_POSITIONS.movie.radius)) {
-    currentGenreText.textContent = "Movie World";
-  } else if (isInsideCircle(x, z, WORLD_POSITIONS.tv.x, WORLD_POSITIONS.tv.z, WORLD_POSITIONS.tv.radius)) {
-    currentGenreText.textContent = "TV Show World";
-  } else if (isInsideCircle(x, z, WORLD_POSITIONS.music.x, WORLD_POSITIONS.music.z, WORLD_POSITIONS.music.radius)) {
-    currentGenreText.textContent = "Music World";
-  } else if (isInsideCircle(x, z, WORLD_POSITIONS.game.x, WORLD_POSITIONS.game.z, WORLD_POSITIONS.game.radius)) {
-    currentGenreText.textContent = "Game World";
-  } else if (isInsideCircle(x, z, WORLD_POSITIONS.anime.x, WORLD_POSITIONS.anime.z, WORLD_POSITIONS.anime.radius)) {
-    currentGenreText.textContent = "Anime World";
-  } else {
-    currentGenreText.textContent = "Bridge";
-  }
-} // ===============================
-// 21. PANEL HELPERS
-// ===============================
-
-
-function closeAllPanels() {
-  closeMoviePanel();
-  closeTVPanel();
-  closeMusicPanelFunction();
-  closeGamePanelFunction();
-  closeAnimePanelFunction();
-} // ===============================
-// 22. MOVIE PANEL
-// ===============================
-
-
-function openMoviePanel(genre) {
-  if (!moviePanel) return;
-  panelTitle.textContent = "".concat(genre.name, " Drive-In");
-  panelDescription.textContent = genre.description;
-  movieList.innerHTML = "";
-  genre.movies.forEach(function (movie, index) {
-    var card = document.createElement("div");
-    card.className = "movieCard";
-    card.innerHTML = "\n      <h3>".concat(movie.title, "</h3>\n      <p>").concat(movie.note, "</p>\n    ");
-    card.addEventListener("mouseenter", function () {
-      trailerFrame.src = movie.trailer;
-    });
-    card.addEventListener("click", function () {
-      window.open(movie.trailer, "_blank");
-    });
-    movieList.appendChild(card);
-
-    if (index === 0) {
-      trailerFrame.src = movie.trailer;
-    }
-  });
-  moviePanel.classList.remove("hidden");
+function updateComputerCar(deltaTime) {
+  if (!computerCar || !computerCar.visible) return;
+  computerCar.rotation.y += Math.sin(performance.now() * 0.002) * 0.003;
 }
 
-function closeMoviePanel() {
-  if (!moviePanel) return;
-  moviePanel.classList.add("hidden");
-
-  if (trailerFrame) {
-    trailerFrame.src = "";
-  }
-} // ===============================
-// 23. TV PANEL
-// ===============================
-
-
-function openTVPanel(genre) {
-  if (!tvPanel) return;
-  tvPanelTitle.textContent = "".concat(genre.name, " TV Station");
-  tvPanelDescription.textContent = genre.description;
-  tvList.innerHTML = "";
-  genre.shows.forEach(function (show, index) {
-    var card = document.createElement("div");
-    card.className = "tvCard";
-    card.innerHTML = "\n      <h3>".concat(show.title, "</h3>\n      <p>").concat(show.note, "</p>\n    ");
-    card.addEventListener("mouseenter", function () {
-      tvTrailerFrame.src = show.trailer;
-    });
-    card.addEventListener("click", function () {
-      window.open(show.trailer, "_blank");
-    });
-    tvList.appendChild(card);
-
-    if (index === 0) {
-      tvTrailerFrame.src = show.trailer;
-    }
-  });
-  tvPanel.classList.remove("hidden");
+function randomBetween(min, max) {
+  return min + Math.random() * (max - min);
 }
-
-function closeTVPanel() {
-  if (!tvPanel) return;
-  tvPanel.classList.add("hidden");
-
-  if (tvTrailerFrame) {
-    tvTrailerFrame.src = "";
-  }
-} // ===============================
-// 24. MUSIC PANEL
-// ===============================
-
-
-function openMusicPanel(genre) {
-  if (!musicPanel) return;
-  musicPanelTitle.textContent = "".concat(genre.name, " Stage");
-  musicPanelDescription.textContent = genre.description;
-  musicList.innerHTML = "";
-  genre.songs.forEach(function (song, index) {
-    var card = document.createElement("div");
-    card.className = "musicCard";
-    card.innerHTML = "\n      <h3>".concat(song.title, "</h3>\n      <p>").concat(song.note, "</p>\n    ");
-    card.addEventListener("mouseenter", function () {
-      musicVideoFrame.src = song.video;
-    });
-    card.addEventListener("click", function () {
-      window.open(song.video, "_blank");
-    });
-    musicList.appendChild(card);
-
-    if (index === 0) {
-      musicVideoFrame.src = song.video;
-    }
-  });
-  musicPanel.classList.remove("hidden");
-}
-
-function closeMusicPanelFunction() {
-  if (!musicPanel) return;
-  musicPanel.classList.add("hidden");
-
-  if (musicVideoFrame) {
-    musicVideoFrame.src = "";
-  }
-} // ===============================
-// 25. GAME PANEL
-// ===============================
-
-
-function openGamePanel(genre) {
-  if (!gamePanel) return;
-  gamePanelTitle.textContent = "".concat(genre.name, " Station");
-  gamePanelDescription.textContent = genre.description;
-  gameList.innerHTML = "";
-  genre.games.forEach(function (game, index) {
-    var card = document.createElement("div");
-    card.className = "gameCard";
-    card.innerHTML = "\n      <h3>".concat(game.title, "</h3>\n      <p>").concat(game.note, "</p>\n    ");
-    card.addEventListener("mouseenter", function () {
-      gameTrailerFrame.src = game.trailer;
-    });
-    card.addEventListener("click", function () {
-      window.open(game.trailer, "_blank");
-    });
-    gameList.appendChild(card);
-
-    if (index === 0) {
-      gameTrailerFrame.src = game.trailer;
-    }
-  });
-  gamePanel.classList.remove("hidden");
-}
-
-function closeGamePanelFunction() {
-  if (!gamePanel) return;
-  gamePanel.classList.add("hidden");
-
-  if (gameTrailerFrame) {
-    gameTrailerFrame.src = "";
-  }
-} // ===============================
-// 26. ANIME PANEL
-// ===============================
-
-
-function openAnimePanel(genre) {
-  if (!animePanel) return;
-  animePanelTitle.textContent = genre.name;
-  animePanelDescription.textContent = genre.description;
-  animeList.innerHTML = "";
-  genre.anime.forEach(function (anime, index) {
-    var card = document.createElement("div");
-    card.className = "animeCard";
-    card.innerHTML = "\n      <h3>".concat(anime.title, "</h3>\n      <p>").concat(anime.note, "</p>\n    ");
-    card.addEventListener("mouseenter", function () {
-      animeTrailerFrame.src = anime.trailer;
-    });
-    card.addEventListener("click", function () {
-      window.open(anime.trailer, "_blank");
-    });
-    animeList.appendChild(card);
-
-    if (index === 0) {
-      animeTrailerFrame.src = anime.trailer;
-    }
-  });
-  animePanel.classList.remove("hidden");
-}
-
-function closeAnimePanelFunction() {
-  if (!animePanel) return;
-  animePanel.classList.add("hidden");
-
-  if (animeTrailerFrame) {
-    animeTrailerFrame.src = "";
-  }
-} // ===============================
-// 27. HIGHLIGHT ACTIVE STATIONS
-// ===============================
-
-
-function updateStationHighlights() {
-  updateHighlightForGroup(movieStations, 0.45, 1.1);
-  updateHighlightForGroup(tvTheaters, 0.55, 1.2);
-  updateHighlightForGroup(musicStations, 0.5, 1.2);
-  updateHighlightForGroup(gameStations, 0.45, 1.2);
-  updateHighlightForGroup(animeStations, 0.5, 1.2);
-}
-
-function updateHighlightForGroup(stations, normalGlow, activeGlow) {
-  stations.forEach(function (station) {
-    station.group.children.forEach(function (child) {
-      if (child.material && child.material.emissive) {
-        child.material.emissiveIntensity = currentStation === station ? activeGlow : normalGlow;
-      }
-    });
-  });
-} // ===============================
-// 28. ANIMATION LOOP
-// ===============================
-
-
-function animate() {
-  requestAnimationFrame(animate);
-  updateCarMovement();
-  updateCamera();
-  checkStationDistance();
-  updateStationHighlights();
-  renderer.render(scene, camera);
-}
-
-animate(); // ===============================
-// 29. RESPONSIVE CANVAS
-// ===============================
-
-window.addEventListener("resize", function () {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-});
 //# sourceMappingURL=three.dev.js.map

@@ -28,20 +28,22 @@ body {
   background: rgba(0, 0, 0, 0.65);
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 18px;
-  padding: 16px 20px;
-  max-width: 360px;
+  padding: 18px 22px;
+  max-width: 430px;
   backdrop-filter: blur(10px);
 }
 
 #hud h2 {
-  margin: 0 0 8px;
+  margin: 0 0 10px;
   color: #ffcc66;
+  font-size: 24px;
 }
 
 #hud p {
   margin: 0;
-  color: #ddd;
-  font-size: 14px;
+  color: #eeeeee;
+  font-size: 17px;
+  line-height: 1.45;
 }
 
 @media (max-width: 800px) {
@@ -52,7 +54,6 @@ body {
 
 /* ===============================
    CLEAN UNIVERSAL POPUP SYSTEM
-   This fixes Movie, TV, Music, Game, and Anime panels.
    =============================== */
 
 #moviePanel,
@@ -79,7 +80,6 @@ body {
   box-shadow: 0 0 45px rgba(0, 0, 0, 0.65);
 }
 
-/* Panel colors */
 #moviePanel {
   border-color: rgba(255, 204, 102, 0.45);
   box-shadow: 0 0 45px rgba(255, 204, 102, 0.22);
@@ -105,12 +105,10 @@ body {
   box-shadow: 0 0 45px rgba(255, 107, 107, 0.22);
 }
 
-/* Hide panels */
 .hidden {
   display: none !important;
 }
 
-/* Close buttons */
 #closePanel,
 #closeTvPanel,
 #closeMusicPanel,
@@ -141,7 +139,6 @@ body {
   background: rgba(255, 255, 255, 0.18);
 }
 
-/* Panel titles */
 #panelTitle,
 #tvPanelTitle,
 #musicPanelTitle,
@@ -172,7 +169,6 @@ body {
   color: #ff6b6b;
 }
 
-/* Panel descriptions */
 #panelDescription,
 #tvPanelDescription,
 #musicPanelDescription,
@@ -184,7 +180,6 @@ body {
   font-size: 15px;
 }
 
-/* Content layout */
 #movieContent,
 #tvContent,
 #musicContent,
@@ -196,7 +191,6 @@ body {
   align-items: start;
 }
 
-/* Lists */
 #movieList,
 #tvList,
 #musicList,
@@ -207,7 +201,6 @@ body {
   gap: 12px;
 }
 
-/* Cards */
 .movieCard,
 .tvCard,
 .musicCard,
@@ -272,7 +265,6 @@ body {
   line-height: 1.4;
 }
 
-/* Preview boxes */
 #previewBox,
 #tvPreviewBox,
 #musicPreviewBox,
@@ -291,7 +283,6 @@ body {
   color: white;
 }
 
-/* Video frames */
 #trailerFrame,
 #tvTrailerFrame,
 #musicVideoFrame,
@@ -304,7 +295,6 @@ body {
   background: black;
 }
 
-/* Mobile / small screen version */
 @media (max-width: 850px) {
   #moviePanel,
   #tvPanel,
@@ -338,7 +328,6 @@ body {
     height: 200px;
   }
 }
-
 
 /* ===============================
    3D CAR MODEL SELECTION
@@ -512,7 +501,6 @@ body {
   box-shadow: 0 0 22px rgba(255, 107, 107, 0.55);
 }
 
-/* Only show joystick on tablets and phones */
 @media (max-width: 900px) {
   #mobileControls {
     display: block;
@@ -522,20 +510,20 @@ body {
     left: 14px;
     top: 14px;
     max-width: calc(100vw - 28px);
-    padding: 12px 14px;
+    padding: 14px 16px;
     border-radius: 16px;
   }
 
   #hud h2 {
-    font-size: 18px;
+    font-size: 20px;
   }
 
   #hud p {
-    font-size: 12px;
+    font-size: 15px;
+    line-height: 1.4;
   }
 }
 
-/* Smaller phone version */
 @media (max-width: 520px) {
   #joystick {
     width: 105px;
@@ -634,5 +622,212 @@ body {
   #gameTrailerFrame,
   #animeTrailerFrame {
     height: 160px;
+  }
+}
+
+/* ===============================
+   START SCREEN
+   =============================== */
+
+#startScreen {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 42px 20px;
+  text-align: center;
+  background:
+    radial-gradient(circle at top, rgba(255, 204, 102, 0.16), transparent 34%),
+    radial-gradient(circle at bottom left, rgba(124, 199, 255, 0.16), transparent 34%),
+    linear-gradient(180deg, rgba(5, 5, 10, 0.98), rgba(0, 0, 0, 0.96));
+}
+
+#startScreen h1 {
+  margin: 0 0 12px;
+  font-size: clamp(42px, 7vw, 82px);
+  letter-spacing: 1px;
+  color: white;
+  text-shadow: 0 0 28px rgba(255, 204, 102, 0.45);
+}
+
+#startScreen > p {
+  width: min(760px, 94vw);
+  margin: 0;
+  color: #dddddd;
+  line-height: 1.6;
+  font-size: 17px;
+}
+
+.startActionButtons {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 26px 0 20px;
+}
+
+#startBtn {
+  padding: 16px 34px;
+  border: none;
+  border-radius: 999px;
+  background: #ffcc66;
+  color: #111111;
+  font-weight: 800;
+  font-size: 17px;
+  cursor: pointer;
+  box-shadow: 0 0 28px rgba(255, 204, 102, 0.45);
+  transition: 0.2s;
+}
+
+#startBtn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 0 38px rgba(255, 204, 102, 0.7);
+}
+
+/* ===============================
+   COIN HUD
+   =============================== */
+
+#coinHud {
+  position: fixed;
+  left: 20px;
+  top: 148px;
+  z-index: 11;
+  width: 320px;
+  max-width: calc(100vw - 40px);
+  padding: 16px 18px;
+  border-radius: 18px;
+  background: rgba(0, 0, 0, 0.68);
+  border: 1px solid rgba(255, 204, 102, 0.38);
+  box-shadow: 0 0 35px rgba(255, 204, 102, 0.18);
+  backdrop-filter: blur(10px);
+}
+
+#coinHud h3 {
+  margin: 0 0 8px;
+  color: #ffcc66;
+  font-size: 20px;
+}
+
+.coinStats {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.coinStats span {
+  padding: 10px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  font-size: 15px;
+  color: #cccccc;
+}
+
+.coinStats strong {
+  color: #ffcc66;
+}
+
+#coinMessage {
+  margin: 0;
+  color: #dddddd;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+/* ===============================
+   BOOST BUTTON
+   Hidden on desktop.
+   Shows only on mobile / small screens.
+   =============================== */
+
+#boostBtn {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  #boostBtn {
+    display: block;
+    position: fixed;
+    right: 28px;
+    bottom: 160px;
+    z-index: 42;
+
+    width: 92px;
+    height: 92px;
+
+    border-radius: 50%;
+    border: none;
+
+    background: rgba(255, 204, 102, 0.95);
+    color: #111111;
+
+    font-size: 14px;
+    font-weight: 900;
+    text-transform: uppercase;
+    cursor: pointer;
+
+    box-shadow: 0 0 28px rgba(255, 204, 102, 0.6);
+    transition: 0.2s;
+
+    pointer-events: auto;
+    touch-action: none;
+  }
+
+  #boostBtn:active {
+    transform: scale(0.96);
+  }
+}
+
+@media (max-width: 520px) {
+  #boostBtn {
+    right: 18px;
+    bottom: 132px;
+    width: 78px;
+    height: 78px;
+    font-size: 12px;
+  }
+}
+
+/* ===============================
+   WORLD WELCOME TEXT
+   =============================== */
+
+#worldWelcomeText {
+  position: fixed;
+  left: 50%;
+  top: 26px;
+  transform: translateX(-50%);
+  z-index: 50;
+  padding: 14px 24px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.72);
+  border: 1px solid rgba(255, 204, 102, 0.45);
+  box-shadow: 0 0 28px rgba(255, 204, 102, 0.25);
+  color: #ffffff;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  backdrop-filter: blur(10px);
+}
+
+@media (max-width: 900px) {
+  #coinHud {
+    left: 14px;
+    top: 104px;
+    padding: 12px 14px;
+  }
+}
+
+@media (max-width: 520px) {
+  #startScreen {
+    padding: 26px 14px;
+  }
+
+  #coinHud {
+    top: 104px;
   }
 }

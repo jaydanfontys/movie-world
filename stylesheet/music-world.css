@@ -95,6 +95,22 @@
   background: black;
 }
 
+/* ===============================
+   SMALL SOUND NOTE
+   =============================== */
+
+.musicCard::after {
+  content: "Stage audio plays when you drive close";
+  display: block;
+  margin-top: 6px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+/* ===============================
+   RESPONSIVE MUSIC PANEL
+   =============================== */
+
 @media (max-width: 800px) {
   #musicPanel {
     left: 20px;

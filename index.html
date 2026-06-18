@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>World of Entertainment</title>
+  <title>Video Entertainment Drive</title>
 
   <link rel="stylesheet" href="stylesheet/style.css" />
   <link rel="stylesheet" href="stylesheet/hub-world.css" />
@@ -29,11 +29,12 @@
        START SCREEN
        =============================== -->
   <div id="startScreen">
-    <h1>World of Entertainment</h1>
+    <h1>Video Entertainment Drive</h1>
 
     <p>
-      Choose your car, start from the central hub, and drive to different entertainment worlds.
-      Discover movies, TV shows, music videos, games, and anime.
+      Choose your car and drive through a video entertainment hub filled with movies,
+      TV shows, music videos, games, and anime. While exploring, collect all the glowing
+      coins hidden across every world.
     </p>
 
     <!-- Car selection -->
@@ -79,7 +80,9 @@
       </div>
     </div>
 
-    <button id="startBtn">Start Exploring</button>
+    <div class="startActionButtons">
+      <button id="startBtn">Start Exploring</button>
+    </div>
   </div>
 
   <!-- ===============================
@@ -87,8 +90,35 @@
        =============================== -->
   <div id="hud">
     <h2 id="currentGenre">Central Entertainment Hub</h2>
-    <p>Use W A S D or Arrow Keys to drive. Go near a station to open its panel.</p>
+    <p>
+      Use W A S D or Arrow Keys to drive. Press Space to boost. On mobile, use the joystick and Boost button.
+      Collect coins while exploring.
+    </p>
   </div>
+
+  <!-- ===============================
+       COIN HUD
+       =============================== -->
+  <div id="coinHud">
+    <h3>Coin Hunt</h3>
+
+    <div class="coinStats">
+      <span>Coins: <strong id="coinCountText">0</strong>/<strong id="coinTotalText">0</strong></span>
+    </div>
+
+    <p id="coinMessage">Collect all coins across every world.</p>
+  </div>
+
+  <!-- ===============================
+       BOOST BUTTON
+       Only visible on mobile with CSS.
+       =============================== -->
+  <button id="boostBtn">Boost</button>
+
+  <!-- ===============================
+       WORLD WELCOME MESSAGE
+       =============================== -->
+  <div id="worldWelcomeText" class="hidden">Welcome to the hub</div>
 
   <!-- ===============================
        MOBILE CONTROLS
@@ -114,7 +144,7 @@
 
       <div id="previewBox">
         <h3>Trailer Preview</h3>
-        <iframe id="trailerFrame" src="" title="Movie trailer" allowfullscreen></iframe>
+        <iframe id="trailerFrame" src="" title="Movie trailer" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
       </div>
     </div>
   </div>
@@ -132,7 +162,7 @@
 
       <div id="tvPreviewBox">
         <h3>TV Show Preview</h3>
-        <iframe id="tvTrailerFrame" src="" title="TV show trailer" allowfullscreen></iframe>
+        <iframe id="tvTrailerFrame" src="" title="TV show trailer" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
       </div>
     </div>
   </div>
@@ -150,7 +180,7 @@
 
       <div id="musicPreviewBox">
         <h3>Music Video Preview</h3>
-        <iframe id="musicVideoFrame" src="" title="Music video preview" allowfullscreen></iframe>
+        <iframe id="musicVideoFrame" src="" title="Music video preview" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
       </div>
     </div>
   </div>
@@ -168,7 +198,7 @@
 
       <div id="gamePreviewBox">
         <h3>Game Trailer Preview</h3>
-        <iframe id="gameTrailerFrame" src="" title="Game trailer preview" allowfullscreen></iframe>
+        <iframe id="gameTrailerFrame" src="" title="Game trailer preview" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
       </div>
     </div>
   </div>
@@ -186,7 +216,7 @@
 
       <div id="animePreviewBox">
         <h3>Anime Trailer Preview</h3>
-        <iframe id="animeTrailerFrame" src="" title="Anime trailer preview" allowfullscreen></iframe>
+        <iframe id="animeTrailerFrame" src="" title="Anime trailer preview" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
       </div>
     </div>
   </div>
