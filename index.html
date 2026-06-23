@@ -37,7 +37,36 @@
       coins hidden across every world.
     </p>
 
-    <!-- Car selection -->
+    <!-- ===============================
+         PLAYER PROFILE SECTION
+         =============================== -->
+    <div id="playerProfileBox">
+      <h2>Player Profile</h2>
+
+      <p>
+        Enter your name to start. If you have played before, your saved progress will be loaded.
+        If you are new, a new profile will be created.
+      </p>
+
+      <div class="playerInputRow">
+        <input
+          type="text"
+          id="playerNameInput"
+          placeholder="Enter your name"
+          autocomplete="off"
+        />
+
+        <button id="loadPlayerBtn">Load Profile</button>
+      </div>
+
+      <p id="playerProfileMessage"></p>
+
+      <div id="playerStatsPreview" class="hidden"></div>
+    </div>
+
+    <!-- ===============================
+         CAR SELECTION
+         =============================== -->
     <div id="carSelection">
       <h2>Choose Your Ride</h2>
 
@@ -97,6 +126,15 @@
   </div>
 
   <!-- ===============================
+       PLAYER HUD
+       Shows after the player profile loads.
+       =============================== -->
+  <div id="playerHud" class="hidden">
+    <h3 id="playerHudName">Player</h3>
+    <p id="playerHudStats">0/0 coins • 0/6 worlds visited</p>
+  </div>
+
+  <!-- ===============================
        COIN HUD
        =============================== -->
   <div id="coinHud">
@@ -144,7 +182,13 @@
 
       <div id="previewBox">
         <h3>Trailer Preview</h3>
-        <iframe id="trailerFrame" src="" title="Movie trailer" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+        <iframe
+          id="trailerFrame"
+          src=""
+          title="Movie trailer"
+          allow="autoplay; encrypted-media; picture-in-picture"
+          allowfullscreen>
+        </iframe>
       </div>
     </div>
   </div>
@@ -162,7 +206,13 @@
 
       <div id="tvPreviewBox">
         <h3>TV Show Preview</h3>
-        <iframe id="tvTrailerFrame" src="" title="TV show trailer" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+        <iframe
+          id="tvTrailerFrame"
+          src=""
+          title="TV show trailer"
+          allow="autoplay; encrypted-media; picture-in-picture"
+          allowfullscreen>
+        </iframe>
       </div>
     </div>
   </div>
@@ -180,7 +230,13 @@
 
       <div id="musicPreviewBox">
         <h3>Music Video Preview</h3>
-        <iframe id="musicVideoFrame" src="" title="Music video preview" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+        <iframe
+          id="musicVideoFrame"
+          src=""
+          title="Music video preview"
+          allow="autoplay; encrypted-media; picture-in-picture"
+          allowfullscreen>
+        </iframe>
       </div>
     </div>
   </div>
@@ -198,7 +254,13 @@
 
       <div id="gamePreviewBox">
         <h3>Game Trailer Preview</h3>
-        <iframe id="gameTrailerFrame" src="" title="Game trailer preview" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+        <iframe
+          id="gameTrailerFrame"
+          src=""
+          title="Game trailer preview"
+          allow="autoplay; encrypted-media; picture-in-picture"
+          allowfullscreen>
+        </iframe>
       </div>
     </div>
   </div>
@@ -216,7 +278,13 @@
 
       <div id="animePreviewBox">
         <h3>Anime Trailer Preview</h3>
-        <iframe id="animeTrailerFrame" src="" title="Anime trailer preview" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+        <iframe
+          id="animeTrailerFrame"
+          src=""
+          title="Anime trailer preview"
+          allow="autoplay; encrypted-media; picture-in-picture"
+          allowfullscreen>
+        </iframe>
       </div>
     </div>
   </div>
@@ -224,6 +292,11 @@
   <!-- Three.js canvas -->
   <canvas id="world"></canvas>
 
+  <!-- IMPORTANT:
+       playerprofile.js must load before three.js
+       because three.js uses window.PlayerProfile.
+  -->
+  <script src="js/playerprofile.js"></script>
   <script type="module" src="js/three.js"></script>
 </body>
 </html>

@@ -2,8 +2,6 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { CSS3DRenderer } from "three/addons/renderers/CSS3DRenderer.js";
 
-// Each world has its own file now.
-// This keeps the main three.js file cleaner.
 import { createHubWorld } from "./hubworld.js";
 
 import {
@@ -37,17 +35,13 @@ import { createAnimeWorld } from "./animeworld.js";
 // 1. BASIC SCENE SETUP
 // ===============================
 
-// This connects Three.js to the canvas in index.html.
 const canvas = document.querySelector("#world");
 
-// The scene is the full 3D world.
 const scene = new THREE.Scene();
 scene.background = new THREE.Color("#080812");
 
-// This scene is only for the YouTube iframe screens.
 const cssScene = new THREE.Scene();
 
-// This is the camera the player looks through.
 const camera = new THREE.PerspectiveCamera(
   65,
   window.innerWidth / window.innerHeight,
@@ -57,31 +51,23 @@ const camera = new THREE.PerspectiveCamera(
 
 const clock = new THREE.Clock();
 
-// Lower number = smoother performance.
-// Higher number = sharper graphics but slower.
-const MAX_PIXEL_RATIO = 0.75;
+const IS_MOBILE = window.innerWidth <= 900;
+const MAX_PIXEL_RATIO = IS_MOBILE ? 0.45 : 0.65;
 
-// This fixes the visibilitychange code below.
-let lastRenderTime = performance.now();
-
-// This draws the normal 3D world.
 const renderer = new THREE.WebGLRenderer({
   canvas: canvas,
-  antialias: false
+  antialias: false,
+  powerPreference: "high-performance"
 });
 
 renderer.setSize(window.innerWidth, window.innerHeight);
-
-// Lower pixel ratio helps performance on slower devices.
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, MAX_PIXEL_RATIO));
 
-// Keep the normal canvas behind the CSS3D video layer.
 renderer.domElement.style.position = "fixed";
 renderer.domElement.style.top = "0";
 renderer.domElement.style.left = "0";
 renderer.domElement.style.zIndex = "1";
 
-// This draws the YouTube iframe screens in the 3D world.
 const cssRenderer = new CSS3DRenderer();
 
 cssRenderer.setSize(window.innerWidth, window.innerHeight);
@@ -96,32 +82,21 @@ cssRenderer.domElement.style.zIndex = "2";
 
 document.body.appendChild(cssRenderer.domElement);
 
-document.addEventListener("visibilitychange", () => {
-  if (document.hidden) {
-    lastRenderTime = performance.now();
-  }
-});
-
 // ===============================
 // 2. HTML ELEMENTS
 // ===============================
 
-// Start screen
 const startScreen = document.querySelector("#startScreen");
 const startBtn = document.querySelector("#startBtn");
 
-// Boost button
 const boostBtn = document.querySelector("#boostBtn");
 
-// Coin HUD
 const coinCountText = document.querySelector("#coinCountText");
 const coinTotalText = document.querySelector("#coinTotalText");
 const coinMessage = document.querySelector("#coinMessage");
 
-// World welcome message
 const worldWelcomeText = document.querySelector("#worldWelcomeText");
 
-// Movie panel
 const moviePanel = document.querySelector("#moviePanel");
 const closePanel = document.querySelector("#closePanel");
 const panelTitle = document.querySelector("#panelTitle");
@@ -129,7 +104,6 @@ const panelDescription = document.querySelector("#panelDescription");
 const movieList = document.querySelector("#movieList");
 const trailerFrame = document.querySelector("#trailerFrame");
 
-// TV panel
 const tvPanel = document.querySelector("#tvPanel");
 const closeTvPanel = document.querySelector("#closeTvPanel");
 const tvPanelTitle = document.querySelector("#tvPanelTitle");
@@ -137,7 +111,6 @@ const tvPanelDescription = document.querySelector("#tvPanelDescription");
 const tvList = document.querySelector("#tvList");
 const tvTrailerFrame = document.querySelector("#tvTrailerFrame");
 
-// Music panel
 const musicPanel = document.querySelector("#musicPanel");
 const closeMusicPanel = document.querySelector("#closeMusicPanel");
 const musicPanelTitle = document.querySelector("#musicPanelTitle");
@@ -145,7 +118,6 @@ const musicPanelDescription = document.querySelector("#musicPanelDescription");
 const musicList = document.querySelector("#musicList");
 const musicVideoFrame = document.querySelector("#musicVideoFrame");
 
-// Game panel
 const gamePanel = document.querySelector("#gamePanel");
 const closeGamePanel = document.querySelector("#closeGamePanel");
 const gamePanelTitle = document.querySelector("#gamePanelTitle");
@@ -153,7 +125,6 @@ const gamePanelDescription = document.querySelector("#gamePanelDescription");
 const gameList = document.querySelector("#gameList");
 const gameTrailerFrame = document.querySelector("#gameTrailerFrame");
 
-// Anime panel
 const animePanel = document.querySelector("#animePanel");
 const closeAnimePanel = document.querySelector("#closeAnimePanel");
 const animePanelTitle = document.querySelector("#animePanelTitle");
@@ -161,10 +132,8 @@ const animePanelDescription = document.querySelector("#animePanelDescription");
 const animeList = document.querySelector("#animeList");
 const animeTrailerFrame = document.querySelector("#animeTrailerFrame");
 
-// HUD text
 const currentGenreText = document.querySelector("#currentGenre");
 
-// Mobile controls
 const joystick = document.querySelector("#joystick");
 const joystickKnob = document.querySelector("#joystickKnob");
 const mobileBrake = document.querySelector("#mobileBrake");
@@ -183,20 +152,7 @@ let welcomeMessageTimeout = null;
 
 let stationCheckTimer = 0;
 let coinCheckTimer = 0;
-
-// ===============================
-// CAR SOUND + BOOST VARIABLES
-// ===============================
-
-// Put these files inside your audio folder:
-//
-// audio/car-engine-loop.mp3
-// audio/boost.mp3
-// audio/background-music.mp3
-// audio/coin.mp3
-//
-// The project still runs if the files are missing,
-// but the sounds will not play.
+let autosaveTimer = 0;
 
 const carEngineAudio = new Audio("audio/car-engine-loop.mp3");
 carEngineAudio.loop = true;
@@ -215,26 +171,20 @@ coinAudio.volume = 0.65;
 let boostActive = false;
 let boostCooldown = false;
 
-// Car speed settings.
-// Increase NORMAL_MAX_SPEED and BOOST_MAX_SPEED if you want it even faster.
 const BOOST_DURATION = 1000;
 const BOOST_COOLDOWN = 1500;
 const NORMAL_MAX_SPEED = 0.5;
 const BOOST_MAX_SPEED = 1.0;
 
-// Mobile joystick values
 let joystickForward = 0;
 let joystickTurn = 0;
 let mobileBrakePressed = false;
 
-// The car is a group that holds the selected car.
 let car = null;
 let activeCarModel = null;
 
-// These buttons come from the car selection cards in index.html.
 const carModelButtons = document.querySelectorAll(".carModelCard");
 
-// This car system supports both simple block cars and 3D model cars.
 const CAR_OPTIONS = {
   redBlock: {
     name: "Red Block Car",
@@ -259,8 +209,6 @@ const CAR_OPTIONS = {
     type: "model",
     path: "models/dodge_challenger.glb",
     targetLength: 5.2,
-
-    // Change this to Math.PI if the car faces backwards.
     rotationY: 0
   },
 
@@ -269,33 +217,24 @@ const CAR_OPTIONS = {
     type: "model",
     path: "models/dodge_charger.glb",
     targetLength: 5.2,
-
-    // Change this to Math.PI if the car faces backwards.
     rotationY: 0
   }
 };
 
-// Default car for user testing.
 let selectedCarKey = "redBlock";
-
-// ===============================
-// COIN HUNT VARIABLES
-// ===============================
 
 const coinObjects = [];
 let collectedCoins = 0;
 let totalCoins = 0;
 let coinGameFinished = false;
 
-// Fewer coins = smoother performance.
-// You can increase this later if the website runs well.
 const COINS_PER_WORLD = {
-  hub: 3,
-  movie: 3,
-  tv: 3,
-  game: 3,
-  music: 3,
-  anime: 3
+  hub: IS_MOBILE ? 1 : 3,
+  movie: IS_MOBILE ? 1 : 3,
+  tv: IS_MOBILE ? 1 : 3,
+  game: IS_MOBILE ? 1 : 3,
+  music: IS_MOBILE ? 1 : 3,
+  anime: IS_MOBILE ? 1 : 3
 };
 
 // ===============================
@@ -304,7 +243,6 @@ const COINS_PER_WORLD = {
 
 const WORLD_POSITIONS = {
   hub: { x: 0, z: 0, radius: 58 },
-
   movie: { x: 0, z: -180, radius: 55 },
   tv: { x: 145, z: -105, radius: 55 },
   game: { x: 145, z: 105, radius: 55 },
@@ -312,14 +250,12 @@ const WORLD_POSITIONS = {
   anime: { x: -145, z: -105, radius: 55 }
 };
 
-// These are the bridges the car is allowed to drive on.
 const BRIDGE_CONNECTIONS = [
   ["hub", "movie"],
   ["hub", "tv"],
   ["hub", "game"],
   ["hub", "music"],
   ["hub", "anime"],
-
   ["movie", "tv"],
   ["tv", "game"],
   ["game", "music"],
@@ -335,7 +271,6 @@ carModelButtons.forEach((button) => {
   button.addEventListener("click", () => {
     const carKey = button.dataset.car;
 
-    // If the button is for a coming soon car, do nothing.
     if (!CAR_OPTIONS[carKey]) return;
 
     selectedCarKey = carKey;
@@ -346,20 +281,29 @@ carModelButtons.forEach((button) => {
 
     button.classList.add("selected");
 
-    // If the car already exists in the world, replace it live.
     if (car) {
       loadSelectedCar();
     }
+
+    window.PlayerProfile?.saveProgress({
+      selectedCar: selectedCarKey
+    });
   });
 });
+
+function selectCarButton(carKey) {
+  carModelButtons.forEach((button) => {
+    button.classList.toggle("selected", button.dataset.car === carKey);
+  });
+}
 
 // ===============================
 // 6. BUTTONS AND KEYBOARD
 // ===============================
 
 if (startBtn) {
-  startBtn.addEventListener("click", () => {
-    startExperience();
+  startBtn.addEventListener("click", async () => {
+    await startExperience();
   });
 }
 
@@ -374,55 +318,48 @@ if (boostBtn) {
   });
 }
 
-function startExperience() {
+async function startExperience() {
+  const profile = await window.PlayerProfile?.startSession({
+    selectedCar: selectedCarKey,
+    totalCoins
+  });
+
+  if (!profile) return;
+
+  if (profile.selectedCar && CAR_OPTIONS[profile.selectedCar]) {
+    selectedCarKey = profile.selectedCar;
+    selectCarButton(selectedCarKey);
+    loadSelectedCar();
+  }
+
   if (startScreen) {
     startScreen.style.display = "none";
   }
 
   gameStarted = true;
 
-  // Start engine sound after the player clicks Start.
-  // Browsers allow audio better after a real click.
   carEngineAudio.play().catch((error) => {
     console.log("Car engine sound could not start yet.", error);
   });
 
-  // Optional background music.
-  // Add audio/background-music.mp3 if you want music.
   backgroundMusicAudio.play().catch((error) => {
     console.log("Background music could not start. Add audio/background-music.mp3 if you want music.", error);
   });
 
   showWorldWelcome("Welcome to Video Entertainment Drive! Collect all coins.");
 
-  console.log("Experience started");
+  window.PlayerProfile?.markWorldVisited("hub");
 }
 
-if (closePanel) {
-  closePanel.addEventListener("click", closeMoviePanel);
-}
+if (closePanel) closePanel.addEventListener("click", closeMoviePanel);
+if (closeTvPanel) closeTvPanel.addEventListener("click", closeTVPanel);
+if (closeMusicPanel) closeMusicPanel.addEventListener("click", closeMusicPanelFunction);
+if (closeGamePanel) closeGamePanel.addEventListener("click", closeGamePanelFunction);
+if (closeAnimePanel) closeAnimePanel.addEventListener("click", closeAnimePanelFunction);
 
-if (closeTvPanel) {
-  closeTvPanel.addEventListener("click", closeTVPanel);
-}
-
-if (closeMusicPanel) {
-  closeMusicPanel.addEventListener("click", closeMusicPanelFunction);
-}
-
-if (closeGamePanel) {
-  closeGamePanel.addEventListener("click", closeGamePanelFunction);
-}
-
-if (closeAnimePanel) {
-  closeAnimePanel.addEventListener("click", closeAnimePanelFunction);
-}
-
-// Save which keys are being pressed.
 window.addEventListener("keydown", (event) => {
   keys[event.key.toLowerCase()] = true;
 
-  // Spacebar = speed boost.
   if (event.code === "Space") {
     event.preventDefault();
     activateBoost();
@@ -434,7 +371,7 @@ window.addEventListener("keyup", (event) => {
 });
 
 // ===============================
-// SPEED BOOST
+// 7. BOOST
 // ===============================
 
 function activateBoost() {
@@ -460,12 +397,11 @@ function activateBoost() {
 
   setTimeout(() => {
     boostCooldown = false;
-    console.log("Speed boost ready again.");
   }, BOOST_COOLDOWN);
 }
 
 // ===============================
-// 7. MOBILE JOYSTICK CONTROLS
+// 8. MOBILE JOYSTICK
 // ===============================
 
 let joystickActive = false;
@@ -490,13 +426,8 @@ if (joystick && joystickKnob) {
     updateJoystick(event);
   });
 
-  joystick.addEventListener("pointerup", () => {
-    resetJoystick();
-  });
-
-  joystick.addEventListener("pointercancel", () => {
-    resetJoystick();
-  });
+  joystick.addEventListener("pointerup", resetJoystick);
+  joystick.addEventListener("pointercancel", resetJoystick);
 }
 
 if (mobileBrake) {
@@ -533,10 +464,7 @@ function updateJoystick(event) {
 
   joystickKnob.style.transform = `translate(calc(-50% + ${knobX}px), calc(-50% + ${knobY}px))`;
 
-  // Right is negative and left is positive.
   joystickTurn = -knobX / joystickMaxDistance;
-
-  // Up moves forward. Down reverses.
   joystickForward = -knobY / joystickMaxDistance;
 }
 
@@ -551,82 +479,47 @@ function resetJoystick() {
 }
 
 // ===============================
-// 8. LIGHTING
+// 9. LIGHTING
 // ===============================
 
 const ambientLight = new THREE.AmbientLight("#ffffff", 0.58);
 scene.add(ambientLight);
 
-const moonLight = new THREE.DirectionalLight("#ffffff", 1.25);
+const moonLight = new THREE.DirectionalLight("#ffffff", 1.1);
 moonLight.position.set(20, 35, 15);
 scene.add(moonLight);
 
 // ===============================
-// 9. CREATE WORLDS
+// 10. CREATE WORLDS
 // ===============================
 
-// Central hub
-const hubWorld = createHubWorld(
-  scene,
-  createFloatingText,
-  WORLD_POSITIONS.hub
-);
+const hubWorld = createHubWorld(scene, createFloatingText, WORLD_POSITIONS.hub);
 
-// Movie World
-const movieWorld = createMovieWorld(
-  scene,
-  cssScene,
-  createFloatingText,
-  WORLD_POSITIONS.movie
-);
+const movieWorld = createMovieWorld(scene, cssScene, createFloatingText, WORLD_POSITIONS.movie);
 const movieStations = movieWorld.movieStations;
 
-// TV World
-const tvWorld = createTVWorld(
-  scene,
-  cssScene,
-  createFloatingText,
-  WORLD_POSITIONS.tv
-);
+const tvWorld = createTVWorld(scene, cssScene, createFloatingText, WORLD_POSITIONS.tv);
 const tvTheaters = tvWorld.tvTheaters;
 
-// Music World
-const musicWorld = createMusicWorld(
-  scene,
-  createFloatingText,
-  WORLD_POSITIONS.music
-);
+const musicWorld = createMusicWorld(scene, createFloatingText, WORLD_POSITIONS.music);
 const musicStations = musicWorld.musicStations;
 
-// Game World
-const gameWorld = createGameWorld(
-  scene,
-  cssScene,
-  createFloatingText,
-  WORLD_POSITIONS.game
-);
+const gameWorld = createGameWorld(scene, cssScene, createFloatingText, WORLD_POSITIONS.game);
 const gameStations = gameWorld.gameStations;
 
-// Anime World
-const animeWorld = createAnimeWorld(
-  scene,
-  createFloatingText,
-  WORLD_POSITIONS.anime
-);
+const animeWorld = createAnimeWorld(scene, createFloatingText, WORLD_POSITIONS.anime);
 const animeStations = animeWorld.animeStations;
 
 // ===============================
-// 10. CREATE BRIDGES
+// 11. BRIDGES
 // ===============================
 
-// Main bridges from the central hub.
 createBridgeBetween(WORLD_POSITIONS.hub, WORLD_POSITIONS.movie, "#ffcc66", "MOVIE WORLD");
 createBridgeBetween(WORLD_POSITIONS.hub, WORLD_POSITIONS.tv, "#7cc7ff", "TV WORLD");
 createBridgeBetween(WORLD_POSITIONS.hub, WORLD_POSITIONS.game, "#80ed99", "GAME WORLD");
 createBridgeBetween(WORLD_POSITIONS.hub, WORLD_POSITIONS.music, "#ff8ee8", "MUSIC WORLD");
 createBridgeBetween(WORLD_POSITIONS.hub, WORLD_POSITIONS.anime, "#ff6b6b", "ANIME WORLD");
 
-// Extra bridges between the outside worlds.
 createBridgeBetween(WORLD_POSITIONS.movie, WORLD_POSITIONS.tv, "#7cc7ff", "TV");
 createBridgeBetween(WORLD_POSITIONS.tv, WORLD_POSITIONS.game, "#80ed99", "GAME");
 createBridgeBetween(WORLD_POSITIONS.game, WORLD_POSITIONS.music, "#ff8ee8", "MUSIC");
@@ -634,27 +527,20 @@ createBridgeBetween(WORLD_POSITIONS.music, WORLD_POSITIONS.anime, "#ff6b6b", "AN
 createBridgeBetween(WORLD_POSITIONS.anime, WORLD_POSITIONS.movie, "#ffcc66", "MOVIES");
 
 // ===============================
-// 11. ENVIRONMENT
+// 12. ENVIRONMENT + CAR
 // ===============================
 
 addStars();
 
-// ===============================
-// 12. PLAYER CAR
-// ===============================
-
 car = createCar();
 scene.add(car);
 
-// Start the player in the central hub.
 car.position.set(0, 0.45, 18);
 car.rotation.y = Math.PI;
 
-// Camera starting position
 camera.position.set(0, 16, 34);
 camera.lookAt(car.position);
 
-// Add coin hunt after the world exists.
 createCoinsForAllWorlds();
 updateCoinHud();
 
@@ -681,7 +567,6 @@ function createBridgeBetween(startWorld, endWorld, color, label) {
     .multiplyScalar(0.5);
 
   const length = bridgeStart.distanceTo(bridgeEnd);
-
   const angle = Math.atan2(direction.x, direction.z);
 
   const bridgeGroup = new THREE.Group();
@@ -701,9 +586,9 @@ function createBridgeBetween(startWorld, endWorld, color, label) {
   const centerLine = new THREE.Mesh(
     new THREE.BoxGeometry(0.35, 0.05, length - 5),
     new THREE.MeshStandardMaterial({
-      color: color,
+      color,
       emissive: color,
-      emissiveIntensity: 0.9
+      emissiveIntensity: 0.75
     })
   );
   centerLine.position.y = 0.1;
@@ -722,22 +607,22 @@ function createBridgeBetween(startWorld, endWorld, color, label) {
   rightRail.position.x = 6;
   bridgeGroup.add(rightRail);
 
-  const bridgeText = createFloatingText(label, color);
-  bridgeText.position.set(-5, 4.8, 0);
-  bridgeGroup.add(bridgeText);
+  if (!IS_MOBILE) {
+    const bridgeText = createFloatingText(label, color);
+    bridgeText.position.set(-5, 4.8, 0);
+    bridgeGroup.add(bridgeText);
+  }
 
   scene.add(bridgeGroup);
 }
 
 // ===============================
-// 14. CREATE CAR
+// 14. CAR
 // ===============================
 
 function createCar() {
   const group = new THREE.Group();
-
   loadSelectedCar(group);
-
   return group;
 }
 
@@ -746,17 +631,20 @@ function loadSelectedCar(targetCarGroup = car) {
 
   const selectedCar = CAR_OPTIONS[selectedCarKey];
 
-  // Remove the previous car before adding the new one.
   while (targetCarGroup.children.length > 0) {
     const child = targetCarGroup.children[0];
     targetCarGroup.remove(child);
   }
 
+  if (IS_MOBILE && selectedCar.type === "model") {
+    const basicCar = createBasicCar("#d62828");
+    targetCarGroup.add(basicCar);
+    return;
+  }
+
   if (selectedCar.type === "basic") {
     const basicCar = createBasicCar(selectedCar.color);
     targetCarGroup.add(basicCar);
-
-    console.log(`${selectedCar.name} loaded.`);
     return;
   }
 
@@ -795,17 +683,11 @@ function loadSelectedCarModel(targetCarGroup, selectedCar) {
       modelWrapper.rotation.y = selectedCar.rotationY;
 
       targetCarGroup.add(modelWrapper);
-
-      console.log(`${selectedCar.name} loaded.`);
     },
+
+    undefined,
 
     function () {
-      console.log(`${selectedCar.name} is loading...`);
-    },
-
-    function (error) {
-      console.log(`${selectedCar.name} could not load. Basic backup car added.`, error);
-
       const backupCar = createBasicCar("#d62828");
       targetCarGroup.add(backupCar);
     }
@@ -815,14 +697,12 @@ function loadSelectedCarModel(targetCarGroup, selectedCar) {
 function createBasicCar(color) {
   const group = new THREE.Group();
 
-  const bodyMaterial = new THREE.MeshStandardMaterial({
-    color: color,
-    roughness: 0.5
-  });
-
   const body = new THREE.Mesh(
     new THREE.BoxGeometry(2.5, 0.75, 4.2),
-    bodyMaterial
+    new THREE.MeshStandardMaterial({
+      color,
+      roughness: 0.5
+    })
   );
   body.position.y = 0.65;
   group.add(body);
@@ -842,7 +722,7 @@ function createBasicCar(color) {
     new THREE.MeshStandardMaterial({
       color: "#9bdcff",
       emissive: "#2d9cdb",
-      emissiveIntensity: 0.25
+      emissiveIntensity: 0.2
     })
   );
   windshield.position.set(0, 1.45, 0.55);
@@ -861,7 +741,7 @@ function createBasicCar(color) {
 
   wheelPositions.forEach((pos) => {
     const wheel = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.38, 0.38, 0.3, 20),
+      new THREE.CylinderGeometry(0.38, 0.38, 0.3, 16),
       wheelMaterial
     );
 
@@ -869,40 +749,6 @@ function createBasicCar(color) {
     wheel.position.set(pos[0], pos[1], pos[2]);
     group.add(wheel);
   });
-
-  const lightMaterial = new THREE.MeshStandardMaterial({
-    color: "#fff3b0",
-    emissive: "#fff3b0",
-    emissiveIntensity: 1.4
-  });
-
-  const leftLight = new THREE.Mesh(
-    new THREE.BoxGeometry(0.4, 0.18, 0.08),
-    lightMaterial
-  );
-  leftLight.position.set(-0.6, 0.82, 2.12);
-  group.add(leftLight);
-
-  const rightLight = leftLight.clone();
-  rightLight.position.x = 0.6;
-  group.add(rightLight);
-
-  const backLightMaterial = new THREE.MeshStandardMaterial({
-    color: "#ff3333",
-    emissive: "#ff3333",
-    emissiveIntensity: 0.8
-  });
-
-  const leftBackLight = new THREE.Mesh(
-    new THREE.BoxGeometry(0.35, 0.16, 0.08),
-    backLightMaterial
-  );
-  leftBackLight.position.set(-0.6, 0.8, -2.12);
-  group.add(leftBackLight);
-
-  const rightBackLight = leftBackLight.clone();
-  rightBackLight.position.x = 0.6;
-  group.add(rightBackLight);
 
   return group;
 }
@@ -913,19 +759,19 @@ function createBasicCar(color) {
 
 function createFloatingText(text, color) {
   const textCanvas = document.createElement("canvas");
-  textCanvas.width = 1024;
-  textCanvas.height = 256;
+  textCanvas.width = IS_MOBILE ? 512 : 1024;
+  textCanvas.height = IS_MOBILE ? 128 : 256;
 
   const ctx = textCanvas.getContext("2d");
   ctx.clearRect(0, 0, textCanvas.width, textCanvas.height);
 
   ctx.fillStyle = color;
-  ctx.font = "bold 90px Arial";
+  ctx.font = IS_MOBILE ? "bold 44px Arial" : "bold 90px Arial";
   ctx.textAlign = "left";
   ctx.textBaseline = "middle";
   ctx.shadowColor = color;
-  ctx.shadowBlur = 25;
-  ctx.fillText(text, 30, 130);
+  ctx.shadowBlur = IS_MOBILE ? 8 : 25;
+  ctx.fillText(text, 30, textCanvas.height / 2);
 
   const texture = new THREE.CanvasTexture(textCanvas);
 
@@ -946,9 +792,7 @@ function createFloatingText(text, color) {
 
 function addStars() {
   const starGeometry = new THREE.BufferGeometry();
-
-  // Lower amount = smoother performance.
-  const starCount = 350;
+  const starCount = IS_MOBILE ? 80 : 180;
   const positions = [];
 
   for (let i = 0; i < starCount; i++) {
@@ -976,7 +820,7 @@ function addStars() {
 }
 
 // ===============================
-// 17. COIN HUNT SYSTEM
+// 17. COINS
 // ===============================
 
 function createCoinsForAllWorlds() {
@@ -988,11 +832,14 @@ function createCoinsForAllWorlds() {
       const angle = (i / amount) * Math.PI * 2 + 0.4;
       const radius = worldKey === "hub" ? 34 : 30 + (i % 2) * 9;
 
-      const x = world.x + Math.cos(angle) * radius;
-      const z = world.z + Math.sin(angle) * radius;
-
       const coin = createCoin();
-      coin.position.set(x, 1.35, z);
+
+      coin.position.set(
+        world.x + Math.cos(angle) * radius,
+        1.35,
+        world.z + Math.sin(angle) * radius
+      );
+
       coin.userData.collected = false;
       coin.userData.worldKey = worldKey;
 
@@ -1006,15 +853,14 @@ function createCoinsForAllWorlds() {
 
 function createCoin() {
   const coinGroup = new THREE.Group();
-
   const coinColor = "#ffcc66";
 
   const coin = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.85, 0.85, 0.15, 32),
+    new THREE.CylinderGeometry(0.85, 0.85, 0.15, IS_MOBILE ? 20 : 32),
     new THREE.MeshStandardMaterial({
       color: coinColor,
       emissive: coinColor,
-      emissiveIntensity: 0.75,
+      emissiveIntensity: 0.65,
       roughness: 0.35
     })
   );
@@ -1022,19 +868,21 @@ function createCoin() {
   coin.rotation.x = Math.PI / 2;
   coinGroup.add(coin);
 
-  const ring = new THREE.Mesh(
-    new THREE.TorusGeometry(1.08, 0.045, 10, 32),
-    new THREE.MeshStandardMaterial({
-      color: "#ffffff",
-      emissive: coinColor,
-      emissiveIntensity: 0.65,
-      transparent: true,
-      opacity: 0.85
-    })
-  );
+  if (!IS_MOBILE) {
+    const ring = new THREE.Mesh(
+      new THREE.TorusGeometry(1.08, 0.045, 10, 32),
+      new THREE.MeshStandardMaterial({
+        color: "#ffffff",
+        emissive: coinColor,
+        emissiveIntensity: 0.55,
+        transparent: true,
+        opacity: 0.85
+      })
+    );
 
-  ring.rotation.x = Math.PI / 2;
-  coinGroup.add(ring);
+    ring.rotation.x = Math.PI / 2;
+    coinGroup.add(ring);
+  }
 
   return coinGroup;
 }
@@ -1046,7 +894,6 @@ function updateCoins(deltaTime) {
     if (coin.userData.collected) return;
 
     coin.rotation.y += deltaTime * 2.2;
-    coin.position.y = 1.35 + Math.sin(performance.now() * 0.004 + coin.position.x) * 0.14;
 
     const distance = car.position.distanceTo(coin.position);
 
@@ -1063,15 +910,18 @@ function collectCoin(coin) {
   collectedCoins += 1;
 
   coinAudio.currentTime = 0;
-  coinAudio.play().catch((error) => {
-    console.log("Coin sound could not play. Add audio/coin.mp3 if you want coin sound.", error);
-  });
+  coinAudio.play().catch(() => {});
 
   showWorldWelcome(`Coin collected! ${collectedCoins}/${totalCoins}`);
 
   if (coinMessage) {
     coinMessage.textContent = "Nice! Keep exploring the other worlds.";
   }
+
+  window.PlayerProfile?.saveProgress({
+    coinsCollected: collectedCoins,
+    totalCoins
+  });
 
   if (collectedCoins >= totalCoins && !coinGameFinished) {
     coinGameFinished = true;
@@ -1081,6 +931,8 @@ function collectCoin(coin) {
     if (coinMessage) {
       coinMessage.textContent = "You collected all coins. Great job!";
     }
+
+    window.PlayerProfile?.finishCoinHunt();
   }
 
   updateCoinHud();
@@ -1097,7 +949,7 @@ function updateCoinHud() {
 }
 
 // ===============================
-// 18. CAR MOVEMENT
+// 18. MOVEMENT
 // ===============================
 
 function updateCarMovement() {
@@ -1111,23 +963,11 @@ function updateCarMovement() {
   let forwardInput = 0;
   let turnInput = 0;
 
-  if (forwardPressed) {
-    forwardInput += 1;
-  }
+  if (forwardPressed) forwardInput += 1;
+  if (backwardPressed) forwardInput -= 1;
+  if (leftPressed) turnInput += 1;
+  if (rightPressed) turnInput -= 1;
 
-  if (backwardPressed) {
-    forwardInput -= 1;
-  }
-
-  if (leftPressed) {
-    turnInput += 1;
-  }
-
-  if (rightPressed) {
-    turnInput -= 1;
-  }
-
-  // Mobile joystick input.
   forwardInput += joystickForward;
   turnInput += joystickTurn;
 
@@ -1168,10 +1008,6 @@ function updateCarMovement() {
   }
 }
 
-// ===============================
-// CAR ENGINE SOUND
-// ===============================
-
 function updateCarSound() {
   if (!gameStarted) return;
 
@@ -1179,9 +1015,7 @@ function updateCarSound() {
 
   if (movingAmount > 0.015) {
     if (carEngineAudio.paused) {
-      carEngineAudio.play().catch((error) => {
-        console.log("Car engine sound could not play.", error);
-      });
+      carEngineAudio.play().catch(() => {});
     }
 
     const targetVolume = THREE.MathUtils.clamp(movingAmount * 1.5, 0.08, 0.48);
@@ -1194,24 +1028,18 @@ function updateCarSound() {
 
     carEngineAudio.playbackRate = boostActive ? 1.55 : 1 + movingAmount * 1.25;
   } else {
-    carEngineAudio.volume = THREE.MathUtils.lerp(
-      carEngineAudio.volume,
-      0,
-      0.08
-    );
+    carEngineAudio.volume = THREE.MathUtils.lerp(carEngineAudio.volume, 0, 0.08);
   }
 }
 
 // ===============================
-// 19. PLAYABLE AREA CHECK
+// 19. PLAYABLE AREA
 // ===============================
 
 function isCarInPlayableArea() {
   const point = new THREE.Vector2(car.position.x, car.position.z);
 
-  const worldKeys = Object.keys(WORLD_POSITIONS);
-
-  for (const key of worldKeys) {
+  for (const key of Object.keys(WORLD_POSITIONS)) {
     const world = WORLD_POSITIONS[key];
 
     if (isInsideCircle(point.x, point.y, world.x, world.z, world.radius)) {
@@ -1234,7 +1062,6 @@ function isCarInPlayableArea() {
 function isInsideCircle(x, z, centerX, centerZ, radius) {
   const dx = x - centerX;
   const dz = z - centerZ;
-
   return Math.sqrt(dx * dx + dz * dz) <= radius;
 }
 
@@ -1274,7 +1101,7 @@ function isPointOnBridge(point, startWorld, endWorld) {
 }
 
 // ===============================
-// 20. CAMERA FOLLOW
+// 20. CAMERA
 // ===============================
 
 function updateCamera() {
@@ -1294,7 +1121,7 @@ function updateCamera() {
 }
 
 // ===============================
-// 21. WORLD WELCOME SYSTEM
+// 21. WORLD SYSTEM
 // ===============================
 
 function checkWorldWelcome() {
@@ -1305,6 +1132,8 @@ function checkWorldWelcome() {
   if (currentWorldKey === lastWelcomedWorld) return;
 
   lastWelcomedWorld = currentWorldKey;
+
+  window.PlayerProfile?.markWorldVisited(currentWorldKey);
 
   const worldNames = {
     hub: "Central Hub",
@@ -1327,29 +1156,12 @@ function getCurrentWorldKey() {
   const x = car.position.x;
   const z = car.position.z;
 
-  if (isInsideCircle(x, z, WORLD_POSITIONS.hub.x, WORLD_POSITIONS.hub.z, WORLD_POSITIONS.hub.radius)) {
-    return "hub";
-  }
-
-  if (isInsideCircle(x, z, WORLD_POSITIONS.movie.x, WORLD_POSITIONS.movie.z, WORLD_POSITIONS.movie.radius)) {
-    return "movie";
-  }
-
-  if (isInsideCircle(x, z, WORLD_POSITIONS.tv.x, WORLD_POSITIONS.tv.z, WORLD_POSITIONS.tv.radius)) {
-    return "tv";
-  }
-
-  if (isInsideCircle(x, z, WORLD_POSITIONS.music.x, WORLD_POSITIONS.music.z, WORLD_POSITIONS.music.radius)) {
-    return "music";
-  }
-
-  if (isInsideCircle(x, z, WORLD_POSITIONS.game.x, WORLD_POSITIONS.game.z, WORLD_POSITIONS.game.radius)) {
-    return "game";
-  }
-
-  if (isInsideCircle(x, z, WORLD_POSITIONS.anime.x, WORLD_POSITIONS.anime.z, WORLD_POSITIONS.anime.radius)) {
-    return "anime";
-  }
+  if (isInsideCircle(x, z, WORLD_POSITIONS.hub.x, WORLD_POSITIONS.hub.z, WORLD_POSITIONS.hub.radius)) return "hub";
+  if (isInsideCircle(x, z, WORLD_POSITIONS.movie.x, WORLD_POSITIONS.movie.z, WORLD_POSITIONS.movie.radius)) return "movie";
+  if (isInsideCircle(x, z, WORLD_POSITIONS.tv.x, WORLD_POSITIONS.tv.z, WORLD_POSITIONS.tv.radius)) return "tv";
+  if (isInsideCircle(x, z, WORLD_POSITIONS.music.x, WORLD_POSITIONS.music.z, WORLD_POSITIONS.music.radius)) return "music";
+  if (isInsideCircle(x, z, WORLD_POSITIONS.game.x, WORLD_POSITIONS.game.z, WORLD_POSITIONS.game.radius)) return "game";
+  if (isInsideCircle(x, z, WORLD_POSITIONS.anime.x, WORLD_POSITIONS.anime.z, WORLD_POSITIONS.anime.radius)) return "anime";
 
   return "bridge";
 }
@@ -1370,7 +1182,7 @@ function showWorldWelcome(message) {
 }
 
 // ===============================
-// 22. STATION INTERACTION
+// 22. STATIONS
 // ===============================
 
 function checkStationDistance() {
@@ -1386,7 +1198,6 @@ function checkStationDistance() {
     clearMusicStageAudio();
 
     currentGenreText.textContent = `${nearestMovie.station.genre.name} Movie Theater`;
-
     updateMovieScreenVideo(nearestMovie.station.genre);
 
     if (currentStation !== nearestMovie.station) {
@@ -1400,7 +1211,6 @@ function checkStationDistance() {
     clearMusicStageAudio();
 
     currentGenreText.textContent = `${nearestTV.station.genre.name} TV Station`;
-
     updateTVScreenVideo(nearestTV.station.genre);
 
     if (currentStation !== nearestTV.station) {
@@ -1408,13 +1218,12 @@ function checkStationDistance() {
       openTVPanel(nearestTV.station.genre);
       currentStation = nearestTV.station;
     }
-  } else if (nearestMusic.station && nearestMusic.distance < 10) {
+  } else if (nearestMusic.station && nearestMusic.distance < 16) {
     clearMovieScreenVideo();
     clearGameMonitorVideo();
     clearTVScreenVideo();
 
     currentGenreText.textContent = `${nearestMusic.station.genre.name} Music Stage`;
-
     updateMusicStageAudio(nearestMusic.station.genre);
 
     if (currentStation !== nearestMusic.station) {
@@ -1428,7 +1237,6 @@ function checkStationDistance() {
     clearMusicStageAudio();
 
     currentGenreText.textContent = `${nearestGame.station.genre.name} Game Station`;
-
     updateGameMonitorVideo(nearestGame.station.genre);
 
     if (currentStation !== nearestGame.station) {
@@ -1480,24 +1288,19 @@ function getNearestStation(stations) {
 }
 
 function updateLocationText() {
-  const x = car.position.x;
-  const z = car.position.z;
+  const currentWorld = getCurrentWorldKey();
 
-  if (isInsideCircle(x, z, WORLD_POSITIONS.hub.x, WORLD_POSITIONS.hub.z, WORLD_POSITIONS.hub.radius)) {
-    currentGenreText.textContent = "Central Entertainment Hub";
-  } else if (isInsideCircle(x, z, WORLD_POSITIONS.movie.x, WORLD_POSITIONS.movie.z, WORLD_POSITIONS.movie.radius)) {
-    currentGenreText.textContent = "Movie World";
-  } else if (isInsideCircle(x, z, WORLD_POSITIONS.tv.x, WORLD_POSITIONS.tv.z, WORLD_POSITIONS.tv.radius)) {
-    currentGenreText.textContent = "TV Show World";
-  } else if (isInsideCircle(x, z, WORLD_POSITIONS.music.x, WORLD_POSITIONS.music.z, WORLD_POSITIONS.music.radius)) {
-    currentGenreText.textContent = "Music World";
-  } else if (isInsideCircle(x, z, WORLD_POSITIONS.game.x, WORLD_POSITIONS.game.z, WORLD_POSITIONS.game.radius)) {
-    currentGenreText.textContent = "Game World";
-  } else if (isInsideCircle(x, z, WORLD_POSITIONS.anime.x, WORLD_POSITIONS.anime.z, WORLD_POSITIONS.anime.radius)) {
-    currentGenreText.textContent = "Anime World";
-  } else {
-    currentGenreText.textContent = "Bridge";
-  }
+  const labels = {
+    hub: "Central Entertainment Hub",
+    movie: "Movie World",
+    tv: "TV Show World",
+    music: "Music World",
+    game: "Game World",
+    anime: "Anime World",
+    bridge: "Bridge"
+  };
+
+  currentGenreText.textContent = labels[currentWorld] || "Video Entertainment Drive";
 }
 
 // ===============================
@@ -1773,15 +1576,15 @@ function closeAnimePanelFunction() {
 }
 
 // ===============================
-// 29. HIGHLIGHT ACTIVE STATIONS
+// 29. HIGHLIGHT STATIONS
 // ===============================
 
 function updateStationHighlights() {
-  updateHighlightForGroup(movieStations, 0.45, 1.1);
-  updateHighlightForGroup(tvTheaters, 0.55, 1.2);
-  updateHighlightForGroup(musicStations, 0.5, 1.2);
-  updateHighlightForGroup(gameStations, 0.45, 1.2);
-  updateHighlightForGroup(animeStations, 0.5, 1.2);
+  updateHighlightForGroup(movieStations, 0.35, 0.8);
+  updateHighlightForGroup(tvTheaters, 0.35, 0.8);
+  updateHighlightForGroup(musicStations, 0.35, 0.8);
+  updateHighlightForGroup(gameStations, 0.35, 0.8);
+  updateHighlightForGroup(animeStations, 0.35, 0.8);
 }
 
 function updateHighlightForGroup(stations, normalGlow, activeGlow) {
@@ -1799,48 +1602,56 @@ function updateHighlightForGroup(stations, normalGlow, activeGlow) {
 // 30. ANIMATION LOOP
 // ===============================
 
-function animate(time) {
+function animate() {
   requestAnimationFrame(animate);
 
-  if (document.hidden) {
-    return;
-  }
+  if (document.hidden) return;
 
   const deltaTime = clock.getDelta();
 
   updateCarMovement();
   updateCarSound();
 
-  // These timers make the project smoother.
-  // Coins and station checks do not need to run every single frame.
   coinCheckTimer += deltaTime;
   stationCheckTimer += deltaTime;
+  autosaveTimer += deltaTime;
 
-  if (coinCheckTimer >= 0.04) {
+  if (coinCheckTimer >= 0.08) {
     updateCoins(coinCheckTimer);
     coinCheckTimer = 0;
   }
 
   updateCamera();
 
-  if (stationCheckTimer >= 0.15) {
+  if (stationCheckTimer >= 0.28) {
     checkWorldWelcome();
     checkStationDistance();
     updateStationHighlights();
     stationCheckTimer = 0;
   }
 
+  if (autosaveTimer >= 8) {
+    window.PlayerProfile?.saveProgress({
+      currentPlayTimeSeconds: window.PlayerProfile?.getElapsedSeconds?.() || 0
+    });
+
+    autosaveTimer = 0;
+  }
+
   hubWorld.update?.(deltaTime);
   updateMusicDancers(deltaTime);
 
   renderer.render(scene, camera);
-  cssRenderer.render(cssScene, camera);
+
+  if (!IS_MOBILE) {
+    cssRenderer.render(cssScene, camera);
+  }
 }
 
 animate();
 
 // ===============================
-// 31. RESPONSIVE CANVAS
+// 31. RESIZE
 // ===============================
 
 window.addEventListener("resize", () => {
@@ -1849,5 +1660,6 @@ window.addEventListener("resize", () => {
 
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, MAX_PIXEL_RATIO));
+
   cssRenderer.setSize(window.innerWidth, window.innerHeight);
 });
