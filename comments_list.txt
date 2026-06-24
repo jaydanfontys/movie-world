@@ -1,0 +1,590 @@
+C:\Users\jayda\fontys\movie world\movie-world\api\save-player.js||    // On Vercel this may not permanently write.
+C:\Users\jayda\fontys\movie world\movie-world\api\save-player.js||    // The browser localStorage fallback still works.
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// MODEL PATHS
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// TORII GATE SETTINGS
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// I kept your Torii gate size exactly the same.
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// If all gates face the wrong direction, change this.
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// Try 0, Math.PI, Math.PI / 2, or -Math.PI / 2.
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// These are placed at the 3 Anime World entrances:
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// 1. Hub -> Anime
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// 2. Music -> Anime
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// 3. Movie -> Anime
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// SHRINE SETTINGS
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// I put your Malevolent Shrine scale back the way you had it.
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// I only removed the extra "40" after the line because that breaks JavaScript.
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// This puts the shrine in the middle of Anime World.
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// Change this if the shrine faces the wrong direction.
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// ANIME GENRE MODEL SETTINGS
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// maxSize = object size
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// position = where it floats above the circle/platform
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// modelOffset = small correction if a model appears off the platform
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// MODEL CACHE
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// FLOATING MODEL ANIMATION
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// ANIME WORLD DATA
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// CREATE ANIME WORLD
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// ADD CENTER SHRINE
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// TORII GATE ENTRANCES
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// CREATE ANIME STATION
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// ADD FLOATING GENRE MODEL
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// FLOATING ANIMATION LOOP
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// LOAD MODELS ONCE
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// BACKUP SHRINE
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// BACKUP TORII GATE
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// BACKUP GENRE OBJECT
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// ANIME DECORATION
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// HELPER FUNCTIONS
+C:\Users\jayda\fontys\movie world\movie-world\js\animeworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||// ACTIVE GAME MONITOR VIDEO
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||// These variables remember the CSS scene and the game world position.
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||// They allow the monitor video to be created only when the car is near a station.
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||// This object remembers where each game station is.
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||// These remember the video that is currently active.
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||// GAME WORLD DATA
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||// CREATE GAME WORLD
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||  // Save these so the monitor video can be created later.
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||    // Save the station position.
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||    // The video is NOT created here anymore.
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||    // This keeps the project much faster.
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||// CREATE GAME STATION
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||  // Make the station face the center of Game World.
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||  // Main platform
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||  // Glowing platform detail
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||  // 3D monitor model
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||  // Small console box
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||  // Game controller
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||  // Floating genre name
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||// ADD 3D MONITOR MODEL
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||  // ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||  // EASY MONITOR MODEL SETTINGS
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||  // ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||  // x = left/right
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||  // y = up/down
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||  // z = forward/back
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||  // Change this if the monitor faces the wrong way.
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||      // Change this if the monitor is too big or small.
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||// BACKUP MONITOR
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||// UPDATE ACTIVE MONITOR VIDEO
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||  // If the correct video is already playing, do nothing.
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||  // Remove the old video first.
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||// CLEAR ACTIVE MONITOR VIDEO
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||// CREATE YOUTUBE IFRAME SCREEN
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||  // ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||  // EASY VIDEO SCREEN SETTINGS
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||  // ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||  // Change this to make the video wider/narrower.
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||  // Change this to make the video taller/shorter.
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||  // Change these to move the video on the monitor.
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||  // x = left/right
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||  // y = up/down
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||  // z = forward/back
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||  // This scales the HTML iframe into the 3D world size.
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||  // Make the video face the center of Game World.
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||  // Change this to Math.PI if the video appears backwards.
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||// MAKE YOUTUBE AUTOPLAY URL
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||// CENTER MODEL HELPER
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||// CONTROLLER SHAPE
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||// GAME DECORATIONS
+C:\Users\jayda\fontys\movie world\movie-world\js\gameworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\hubworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\hubworld.js||// HUB SIGN SETTINGS
+C:\Users\jayda\fontys\movie world\movie-world\js\hubworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\hubworld.js||// These control the size and position of the hub signs.
+C:\Users\jayda\fontys\movie world\movie-world\js\hubworld.js||// x = left / right
+C:\Users\jayda\fontys\movie world\movie-world\js\hubworld.js||// y = up / down
+C:\Users\jayda\fontys\movie world\movie-world\js\hubworld.js||// z = forward / backward
+C:\Users\jayda\fontys\movie world\movie-world\js\hubworld.js||// Move these if a sign is in the wrong place.
+C:\Users\jayda\fontys\movie world\movie-world\js\hubworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\hubworld.js||// CREATE CENTRAL HUB
+C:\Users\jayda\fontys\movie world\movie-world\js\hubworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\hubworld.js||  // New hub signs and billboards.
+C:\Users\jayda\fontys\movie world\movie-world\js\hubworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\hubworld.js||// HUB NAVIGATION SIGNS
+C:\Users\jayda\fontys\movie world\movie-world\js\hubworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\hubworld.js||    // Make each sign face the center of the hub.
+C:\Users\jayda\fontys\movie world\movie-world\js\hubworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\hubworld.js||// MAIN MAP SIGN
+C:\Users\jayda\fontys\movie world\movie-world\js\hubworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\hubworld.js||  // Background
+C:\Users\jayda\fontys\movie world\movie-world\js\hubworld.js||  // Border glow
+C:\Users\jayda\fontys\movie world\movie-world\js\hubworld.js||  // Title
+C:\Users\jayda\fontys\movie world\movie-world\js\hubworld.js||  // World list
+C:\Users\jayda\fontys\movie world\movie-world\js\hubworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\hubworld.js||// DIRECTION SIGNS
+C:\Users\jayda\fontys\movie world\movie-world\js\hubworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\hubworld.js||  // Background
+C:\Users\jayda\fontys\movie world\movie-world\js\hubworld.js||  // Border
+C:\Users\jayda\fontys\movie world\movie-world\js\hubworld.js||  // Arrow
+C:\Users\jayda\fontys\movie world\movie-world\js\hubworld.js||  // Title
+C:\Users\jayda\fontys\movie world\movie-world\js\hubworld.js||  // Subtitle
+C:\Users\jayda\fontys\movie world\movie-world\js\hubworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\hubworld.js||// SIGN FRAME AND POSTS
+C:\Users\jayda\fontys\movie world\movie-world\js\hubworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\hubworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\hubworld.js||// HOLOGRAM PROJECTOR + EARTH HOLOGRAM
+C:\Users\jayda\fontys\movie world\movie-world\js\hubworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\hubworld.js||  // Raise/lower the projector here.
+C:\Users\jayda\fontys\movie world\movie-world\js\hubworld.js||  // Bigger middle number = higher projector.
+C:\Users\jayda\fontys\movie world\movie-world\js\hubworld.js||  // Raise/lower the hologram here.
+C:\Users\jayda\fontys\movie world\movie-world\js\hubworld.js||  // ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\hubworld.js||  // LOAD PROJECTOR MODEL
+C:\Users\jayda\fontys\movie world\movie-world\js\hubworld.js||  // ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\hubworld.js||      // Center the model inside the holder.
+C:\Users\jayda\fontys\movie world\movie-world\js\hubworld.js||      // Keep the model inside the holder.
+C:\Users\jayda\fontys\movie world\movie-world\js\hubworld.js||      // Make projector bigger so the actual 3D model shows.
+C:\Users\jayda\fontys\movie world\movie-world\js\hubworld.js||  // ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\hubworld.js||  // LOAD EARTH HOLOGRAM MODEL
+C:\Users\jayda\fontys\movie world\movie-world\js\hubworld.js||  // ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\hubworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\hubworld.js||// CENTER MODEL HELPER
+C:\Users\jayda\fontys\movie world\movie-world\js\hubworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\hubworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\hubworld.js||// HUB DECORATIONS
+C:\Users\jayda\fontys\movie world\movie-world\js\hubworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// MODEL PATHS
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// EASY MODEL SIZE SETTINGS
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// Change these to make the 3D models bigger or smaller.
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// EASY MODEL POSITION SETTINGS
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// x = left / right
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// y = up / dow4
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// z = forward / backward
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// Change these if the models face the wrong direction.
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// YOUTUBE PROJECTOR SCREEN SETTINGS
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// This controls the YouTube video screen on the projector screen model.
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// x = left / right
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// y = up / down
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// z = forward / backward
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// Bigger / smaller YouTube screen.
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// MODEL CACHE
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// CSS3D VIDEO SCREEN MEMORY
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// MOVIE WORLD DATA
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// CREATE MOVIE WORLD
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||  // Popcorn machine in the middle of Movie World.
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// CREATE MOVIE THEATER
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||  // 3D projector screen model for each genre.
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||  // Cinema seats in front of the projector screen.
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||  // If the model is missing, it will use a simple backup seat.
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// ADD PROJECTOR SCREEN MODEL
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// ADD POPCORN MACHINE IN CENTER
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// ADD MOVIE SEATS
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// MOVIE SCREEN VIDEO FUNCTIONS
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// LOAD MODELS ONCE
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// BACKUP PROJECTOR SCREEN
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// BACKUP POPCORN MACHINE
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// BACKUP MOVIE SEAT
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// MOVIE DECORATIONS
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// HELPER FUNCTIONS
+C:\Users\jayda\fontys\movie world\movie-world\js\movieworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// STAGE MODEL SETTINGS
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// These control where the 3D stage model is placed inside each music station.
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// x = left/right
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// y = up/down
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// z = forward/back
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// TRIGGER / POPUP SETTINGS
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// This is the invisible point the car checks to open the music popup.
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// I placed it close to the 3D stage model.
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// This visible circle helps you see where the popup should open.
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// You can make this smaller later, but for now it helps with testing.
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// DANCER SETTINGS
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// Keep this low for performance.
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// 2 dancers per stage = 12 dancers total.
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// Change this to make all dancers bigger or smaller.
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// Turn this off if the website becomes slow.
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// true = dancers animate
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// false = dancers stay still
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// These are the dancing models in your models folder.
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// These store loaded dancer models so we do not load the same file again and again.
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// 3D SPEAKER MODEL SETTINGS
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// Change this if the speaker is too big/small.
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// Try 0.05, 0.06, 0.08, or 0.1.
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// These are the speaker positions around each stage.
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// x = left/right
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// y = up/down
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// z = forward/back
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// YOUTUBE MUSIC VIDEO HELPERS
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||  // No local mp3 audio to stop.
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||  // The popup iframe is cleared inside three.js when the panel closes.
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// This must be called in the main animation loop in three.js.
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// It updates all dancer animations.
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// MUSIC WORLD DATA
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// CREATE MUSIC WORLD
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||    // Add the station first so matrix calculations work.
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||    // Important fix:
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||    // The old code added position.x and position.z again after localToWorld().
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||    // localToWorld() already includes the Music World position.
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||    // Adding position again moved the trigger far away from the 3D model.
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// MUSIC STAGE
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||  // Make the station face the middle of Music World.
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||  // The genre sign is closer to the actual stage model.
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||  // This text is near the stage area too.
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// VISIBLE TRIGGER AREA
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// ADD 3D STAGE MODEL
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||  // I kept your current custom stage position.
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||  // I kept your current custom stage rotation.
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||      // I kept your current custom stage scale.
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// ADD 3D SPEAKER MODELS
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// LOAD SPEAKER MODEL ONCE
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// BACKUP SPEAKERS
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// ADD DANCERS AROUND STAGE
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||  // Put the small crowd around the stage area.
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||    // Spread dancers in front of the stage.
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// LOAD AND CLONE DANCER MODEL
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||      // Make dancers face the stage.
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// LOAD DANCER MODEL ONCE
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// SIMPLE BACKUP DANCE BOUNCE
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// BACKUP STAGE
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// CENTER MODEL HELPER
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// RANDOM HELPER
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// MUSIC DECORATION
+C:\Users\jayda\fontys\movie world\movie-world\js\musicworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\playerprofile.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\playerprofile.js||// PLAYER PROFILE SYSTEM
+C:\Users\jayda\fontys\movie world\movie-world\js\playerprofile.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\playerprofile.js||// This file connects the front-end with the small backend API.
+C:\Users\jayda\fontys\movie world\movie-world\js\playerprofile.js||// It also uses localStorage as a fallback so the project still works on Vercel.
+C:\Users\jayda\fontys\movie world\movie-world\js\playerprofile.js||  // Save to backend too. This is intentionally not awaited during gameplay.
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// 1. BASIC SCENE SETUP
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// 2. HTML ELEMENTS
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// 3. GAME VARIABLES
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// 4. WORLD POSITIONS
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// 5. CAR SELECTION
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// 6. BUTTONS AND KEYBOARD
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// 7. BOOST
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// 8. MOBILE JOYSTICK
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// 9. LIGHTING
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// 10. CREATE WORLDS
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// 11. BRIDGES
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// 12. ENVIRONMENT + CAR
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// 13. BRIDGE SYSTEM
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// 14. CAR
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// 15. FLOATING TEXT
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// 16. STARS
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// 17. COINS
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// 18. MOVEMENT
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// 19. PLAYABLE AREA
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// 20. CAMERA
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// 21. WORLD SYSTEM
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// 22. STATIONS
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// 23. PANEL HELPERS
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// 24. MOVIE PANEL
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// 25. TV PANEL
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// 26. MUSIC PANEL
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// 27. GAME PANEL
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// 28. ANIME PANEL
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// 29. HIGHLIGHT STATIONS
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// 30. ANIMATION LOOP
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// 31. RESIZE
+C:\Users\jayda\fontys\movie world\movie-world\js\three.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// MODEL PATHS
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// MODEL SETTINGS
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// Change these if the models are too big or too small.
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// TV model position inside each TV station.
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// Couch position in front of each TV.
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// Floating remote position in the middle of TV World.
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// Change this if the remote faces the wrong direction.
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// YOUTUBE SCREEN SETTINGS
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// This controls where the YouTube screen appears on the TV model.
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// x = left/right
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// y = up/down
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// z = forward/back
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// Bigger/smaller YouTube iframe screen.
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// MODEL CACHE
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// CSS3D VIDEO SCREEN MEMORY
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// FLOATING REMOTE ANIMATION
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// TV SHOW WORLD DATA
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// CREATE TV SHOW WORLD
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||  // Floating remote in the middle of TV World.
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// CREATE TV STATION
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// ADD 3D TV MODEL
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// ADD COUCH MODEL
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// ADD FLOATING REMOTE
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// TV SCREEN VIDEO FUNCTIONS
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// LOAD MODELS ONCE
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// REMOTE ANIMATION
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// BACKUP MODELS
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// TV DECORATION
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// HELPER FUNCTIONS
+C:\Users\jayda\fontys\movie world\movie-world\js\tvworld.js||// ===============================
+C:\Users\jayda\fontys\movie world\movie-world\stylesheet\game-world.css||/* ===============================
+C:\Users\jayda\fontys\movie world\movie-world\stylesheet\game-world.css||/* ===============================
+C:\Users\jayda\fontys\movie world\movie-world\stylesheet\game-world.css||/* 
+C:\Users\jayda\fontys\movie world\movie-world\stylesheet\game-world.css||/* ===============================
+C:\Users\jayda\fontys\movie world\movie-world\stylesheet\hub-world.css||/* ===============================
+C:\Users\jayda\fontys\movie world\movie-world\stylesheet\hub-world.css||/* ===============================
+C:\Users\jayda\fontys\movie world\movie-world\stylesheet\hub-world.css||/* Tablet */
+C:\Users\jayda\fontys\movie world\movie-world\stylesheet\hub-world.css||/* Phone */
+C:\Users\jayda\fontys\movie world\movie-world\stylesheet\music-world.css||/* ===============================
+C:\Users\jayda\fontys\movie world\movie-world\stylesheet\music-world.css||/* ===============================
+C:\Users\jayda\fontys\movie world\movie-world\stylesheet\music-world.css||/* ===============================
+C:\Users\jayda\fontys\movie world\movie-world\stylesheet\style.css||/* ===============================
+C:\Users\jayda\fontys\movie world\movie-world\stylesheet\style.css||/* ===============================
+C:\Users\jayda\fontys\movie world\movie-world\stylesheet\style.css||/* ===============================
+C:\Users\jayda\fontys\movie world\movie-world\stylesheet\style.css||/* ===============================
+C:\Users\jayda\fontys\movie world\movie-world\stylesheet\style.css||/* ===============================
+C:\Users\jayda\fontys\movie world\movie-world\stylesheet\style.css||/* ===============================
+C:\Users\jayda\fontys\movie world\movie-world\stylesheet\style.css||/* ===============================
+C:\Users\jayda\fontys\movie world\movie-world\stylesheet\style.css||/* ===============================
+C:\Users\jayda\fontys\movie world\movie-world\stylesheet\style.css||/* ===============================
+C:\Users\jayda\fontys\movie world\movie-world\stylesheet\style.css||/* ===============================
+C:\Users\jayda\fontys\movie world\movie-world\stylesheet\style.css||/* ===============================
+C:\Users\jayda\fontys\movie world\movie-world\stylesheet\tv-world.css||/* ===============================
+C:\Users\jayda\fontys\movie world\movie-world\stylesheet\tv-world.css||/* Main TV popup panel */
+C:\Users\jayda\fontys\movie world\movie-world\stylesheet\tv-world.css||/* Close button for TV panel */
+C:\Users\jayda\fontys\movie world\movie-world\stylesheet\tv-world.css||/* TV panel title */
+C:\Users\jayda\fontys\movie world\movie-world\stylesheet\tv-world.css||/* TV panel description */
+C:\Users\jayda\fontys\movie world\movie-world\stylesheet\tv-world.css||/* TV content layout */
+C:\Users\jayda\fontys\movie world\movie-world\stylesheet\tv-world.css||/* TV show list */
+C:\Users\jayda\fontys\movie world\movie-world\stylesheet\tv-world.css||/* Individual TV show card */
+C:\Users\jayda\fontys\movie world\movie-world\stylesheet\tv-world.css||/* TV trailer preview area */
+C:\Users\jayda\fontys\movie world\movie-world\stylesheet\tv-world.css||/* Responsive TV panel */
+C:\Users\jayda\fontys\movie world\movie-world\index.html||  <!-- ===============================
+C:\Users\jayda\fontys\movie world\movie-world\index.html||    <!-- ===============================
+C:\Users\jayda\fontys\movie world\movie-world\index.html||    <!-- ===============================
+C:\Users\jayda\fontys\movie world\movie-world\index.html||  <!-- ===============================
+C:\Users\jayda\fontys\movie world\movie-world\index.html||  <!-- ===============================
+C:\Users\jayda\fontys\movie world\movie-world\index.html||  <!-- ===============================
+C:\Users\jayda\fontys\movie world\movie-world\index.html||  <!-- ===============================
+C:\Users\jayda\fontys\movie world\movie-world\index.html||  <!-- ===============================
+C:\Users\jayda\fontys\movie world\movie-world\index.html||  <!-- ===============================
+C:\Users\jayda\fontys\movie world\movie-world\index.html||  <!-- ===============================
+C:\Users\jayda\fontys\movie world\movie-world\index.html||  <!-- ===============================
+C:\Users\jayda\fontys\movie world\movie-world\index.html||  <!-- ===============================
+C:\Users\jayda\fontys\movie world\movie-world\index.html||  <!-- ===============================
+C:\Users\jayda\fontys\movie world\movie-world\index.html||  <!-- ===============================
+C:\Users\jayda\fontys\movie world\movie-world\index.html||  <!-- Three.js canvas -->
+C:\Users\jayda\fontys\movie world\movie-world\index.html||  <!-- IMPORTANT:

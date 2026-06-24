@@ -239,13 +239,13 @@ function addMonitorModel(group, genre) {
   // y = up/down
   // z = forward/back
 
-  monitorHolder.position.set(0, 0.7, -1.7); // Change this if the monitor faces the wrong way.
+  monitorHolder.position.set(0, 0.7, -1.7); // Adjust this value if the monitor orientation is incorrect.
 
   monitorHolder.rotation.y = 0;
   group.add(monitorHolder);
   loader.load("models/ultrawide_monitor.glb", function (gltf) {
     var monitor = gltf.scene;
-    centerModel(monitor); // Change this if the monitor is too big or small.
+    centerModel(monitor); // Adjust this scale if the monitor size is incorrect.
 
     monitor.scale.set(1.0, 1.0, 1.0);
     monitor.traverse(function (child) {

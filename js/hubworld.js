@@ -110,7 +110,7 @@ export function createHubWorld(scene, createFloatingText, position) {
   instruction.position.set(-12, 6.5, -10);
   hubGroup.add(instruction);
 
-  // New hub signs and billboards.
+  // Add hub navigation signs and billboards.
   addHubNavigationSigns(hubGroup);
 
   addHubDecorations(hubGroup);
@@ -146,7 +146,7 @@ function addHubNavigationSigns(group) {
 
     sign.position.copy(signData.position);
 
-    // Make each sign face the center of the hub.
+    // Orient each sign toward the center of the hub.
     sign.lookAt(0, signData.position.y, 0);
 
     group.add(sign);

@@ -23,12 +23,12 @@ var TORII_GATE_MODEL_PATH = "models/japanese_torii_gate_game_asset.glb";
 var SHRINE_MODEL_PATH = "models/malevolent_shrine__jujutsu_kaisen.glb"; // ===============================
 // TORII GATE SETTINGS
 // ===============================
-// I kept your Torii gate size exactly the same.
+// Torii gate scale follows the existing design.
 
-var TORII_GATE_SCALE = new THREE.Vector3(0.03, 0.03, 0.03); // If all gates face the wrong direction, change this.
-// Try 0, Math.PI, Math.PI / 2, or -Math.PI / 2.
+var TORII_GATE_SCALE = new THREE.Vector3(0.03, 0.03, 0.03); // Adjust this if the gates face the wrong direction.
+// Acceptable values include 0, Math.PI, Math.PI / 2, or -Math.PI / 2.
 
-var TORII_GATE_ROTATION_OFFSET = 0; // These are placed at the 3 Anime World entrances:
+var TORII_GATE_ROTATION_OFFSET = 0; // These are positioned at the three Anime World entrances:
 // 1. Hub -> Anime
 // 2. Music -> Anime
 // 3. Movie -> Anime
@@ -48,19 +48,19 @@ var TORII_GATE_ENTRANCES = [{
 }]; // ===============================
 // SHRINE SETTINGS
 // ===============================
-// I put your Malevolent Shrine scale back the way you had it.
-// I only removed the extra "40" after the line because that breaks JavaScript.
+// Shrine scale has been restored to the intended reference value.
+// Removed the stray extra value that would break JavaScript.
 
-var SHRINE_SCALE = new THREE.Vector3(40.08, 40.08, 40.08); // This puts the shrine in the middle of Anime World.
+var SHRINE_SCALE = new THREE.Vector3(40.08, 40.08, 40.08); // Shrine placement at the center of Anime World.
 
-var SHRINE_POSITION = new THREE.Vector3(0, 0, 0); // Change this if the shrine faces the wrong direction.
+var SHRINE_POSITION = new THREE.Vector3(0, 0, 0); // Adjust this if the shrine orientation is incorrect.
 
 var SHRINE_ROTATION_Y = 0; // ===============================
 // ANIME GENRE MODEL SETTINGS
 // ===============================
-// maxSize = object size
-// position = where it floats above the circle/platform
-// modelOffset = small correction if a model appears off the platform
+// maxSize = maximum object size
+// position = floating position above the base platform
+// modelOffset = fine adjustment if a model does not align properly
 
 var ANIME_GENRE_MODEL_SETTINGS = {
   "Shonen": {

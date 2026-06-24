@@ -1,8 +1,8 @@
 // ===============================
 // PLAYER PROFILE SYSTEM
 // ===============================
-// This file connects the front-end with the small backend API.
-// It also uses localStorage as a fallback so the project still works on Vercel.
+// Integrates the front-end with the backend API.
+// Uses localStorage as a fallback for deployments without persistent storage.
 
 const ALL_WORLDS = ["hub", "movie", "tv", "game", "music", "anime"];
 
@@ -188,7 +188,7 @@ async function saveProgress(progress = {}) {
   saveToLocalStorage(currentProfile);
   updateProfileUI();
 
-  // Save to backend too. This is intentionally not awaited during gameplay.
+  // Persist progress to the backend without delaying gameplay.
   apiSavePlayer(currentProfile);
 }
 

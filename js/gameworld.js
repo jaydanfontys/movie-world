@@ -295,7 +295,7 @@ function addMonitorModel(group, genre) {
   // z = forward/back
   monitorHolder.position.set(0, 0.7, -1.7);
 
-  // Change this if the monitor faces the wrong way.
+  // Adjust this value if the monitor orientation is incorrect.
   monitorHolder.rotation.y = 0;
 
   group.add(monitorHolder);
@@ -308,7 +308,7 @@ function addMonitorModel(group, genre) {
 
       centerModel(monitor);
 
-      // Change this if the monitor is too big or small.
+      // Adjust this scale if the monitor size is incorrect.
       monitor.scale.set(1.0, 1.0, 1.0);
 
       monitor.traverse((child) => {

@@ -94,7 +94,7 @@ function createHubWorld(scene, createFloatingText, position) {
   hubGroup.add(subtitle);
   var instruction = createFloatingText("DRIVE TO ALL WORLDS AND EXPLORE", "#7cc7ff");
   instruction.position.set(-12, 6.5, -10);
-  hubGroup.add(instruction); // New hub signs and billboards.
+  hubGroup.add(instruction); // Add hub navigation signs and billboards.
 
   addHubNavigationSigns(hubGroup);
   addHubDecorations(hubGroup);
@@ -117,7 +117,7 @@ function addHubNavigationSigns(group) {
   addMainMapSign(group);
   DIRECTION_SIGNS.forEach(function (signData) {
     var sign = createDirectionSign(signData.title, signData.subtitle, signData.arrow, signData.color);
-    sign.position.copy(signData.position); // Make each sign face the center of the hub.
+    sign.position.copy(signData.position); // Orient each sign toward the center of the hub.
 
     sign.lookAt(0, signData.position.y, 0);
     group.add(sign);

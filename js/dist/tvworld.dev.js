@@ -38,12 +38,12 @@ var TV_MODEL_POSITION = new THREE.Vector3(0, -13 - 2); // Couch position in fron
 
 var COUCH_MODEL_POSITION = new THREE.Vector3(0, 0, 3.2); // Floating remote position in the middle of TV World.
 
-var REMOTE_MODEL_POSITION = new THREE.Vector3(0, 5, 0); // Change this if the remote faces the wrong direction.
+var REMOTE_MODEL_POSITION = new THREE.Vector3(0, 5, 0); // Adjust this if the remote orientation is incorrect.
 
 var REMOTE_MODEL_ROTATION = new THREE.Vector3(0, 0, 0); // ===============================
 // YOUTUBE SCREEN SETTINGS
 // ===============================
-// This controls where the YouTube screen appears on the TV model.
+// Defines where the YouTube screen appears on the TV model.
 // x = left/right
 // y = up/down
 // z = forward/back

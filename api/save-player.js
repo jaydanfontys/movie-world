@@ -22,8 +22,8 @@ function writePlayers(players) {
     fs.mkdirSync(path.dirname(dataPath), { recursive: true });
     fs.writeFileSync(dataPath, JSON.stringify(players, null, 2));
   } catch (error) {
-    // On Vercel this may not permanently write.
-    // The browser localStorage fallback still works.
+    // On Vercel deployments, writes may not persist.
+    // LocalStorage fallback remains available for session recovery.
     console.log("Could not write players.json. This is normal on some deployments.", error);
   }
 }

@@ -24,7 +24,7 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 // ===============================
 // STAGE MODEL SETTINGS
 // ===============================
-// These control where the 3D stage model is placed inside each music station.
+// Defines the 3D stage placement within each music station.
 // x = left/right
 // y = up/down
 // z = forward/back
@@ -33,37 +33,37 @@ var STAGE_MODEL_ROTATION_Y = -8;
 var STAGE_MODEL_SCALE = new THREE.Vector3(0.10, 0.07, 0.07); // ===============================
 // TRIGGER / POPUP SETTINGS
 // ===============================
-// This is the invisible point the car checks to open the music popup.
-// I placed it close to the 3D stage model.
+// Invisible trigger point used for opening the music popup.
+// Positioned near the 3D stage model.
 
-var STAGE_TRIGGER_POSITION = new THREE.Vector3(3, 0, 46); // This visible circle helps you see where the popup should open.
-// You can make this smaller later, but for now it helps with testing.
+var STAGE_TRIGGER_POSITION = new THREE.Vector3(3, 0, 46); // Visible marker for the popup activation area.
+// This is useful for layout testing.
 
 var STAGE_TRIGGER_VISUAL_RADIUS = 7.5; // ===============================
 // DANCER SETTINGS
 // ===============================
-// Keep this low for performance.
+// Keep the dancer count low to preserve performance.
 // 2 dancers per stage = 12 dancers total.
 
-var DANCERS_PER_STAGE = 2; // Change this to make all dancers bigger or smaller.
+var DANCERS_PER_STAGE = 2; // Global scale factor for dancer models.
 
-var DANCER_SCALE = 0.02; // Turn this off if the website becomes slow.
-// true = dancers animate
-// false = dancers stay still
+var DANCER_SCALE = 0.02; // Disable animation if performance is an issue.
+// true = animated dancers
+// false = static dancers
 
 var ENABLE_DANCER_ANIMATION = false; // These are the dancing models in your models folder.
 
-var DANCER_MODEL_PATHS = ["models/belly_dance.glb", "models/manuel_animated_001_-_3d_dancing_man.glb", "models/riverdance_dance_free_animation.glb", "models/spider_man_dancing.glb"]; // These store loaded dancer models so we do not load the same file again and again.
+var DANCER_MODEL_PATHS = ["models/belly_dance.glb", "models/manuel_animated_001_-_3d_dancing_man.glb", "models/riverdance_dance_free_animation.glb", "models/spider_man_dancing.glb"]; // Cache loaded dancer models to avoid repeated GLTF loads.
 
 var dancerModelCache = {};
 var dancerMixers = []; // ===============================
 // 3D SPEAKER MODEL SETTINGS
 // ===============================
 
-var SPEAKER_MODEL_PATH = "models/doof_wagon_speakers.glb"; // Change this if the speaker is too big/small.
+var SPEAKER_MODEL_PATH = "models/doof_wagon_speakers.glb"; // Speaker model scale; adjust this if size is incorrect.
 // Try 0.05, 0.06, 0.08, or 0.1.
 
-var SPEAKER_MODEL_SCALE = new THREE.Vector3(0.06, 0.06, 0.06); // These are the speaker positions around each stage.
+var SPEAKER_MODEL_SCALE = new THREE.Vector3(0.06, 0.06, 0.06); // Speaker positions around each stage.
 // x = left/right
 // y = up/down
 // z = forward/back
@@ -94,10 +94,10 @@ function updateMusicStageAudio(genre) {
   console.log("".concat(genre.name, " stage reached. YouTube video should play in the popup."));
 }
 
-function clearMusicStageAudio() {} // No local mp3 audio to stop.
-// The popup iframe is cleared inside three.js when the panel closes.
-// This must be called in the main animation loop in three.js.
-// It updates all dancer animations.
+function clearMusicStageAudio() {} // No local MP3 playback is active for the music stage.
+// The popup iframe cleanup is handled by three.js when the panel closes.
+// Called from the main three.js animation loop.
+// Updates dancer animation mixers.
 
 
 function updateMusicDancers(deltaTime) {
@@ -233,9 +233,8 @@ function createMusicWorld(scene, createFloatingText, position) {
     var station = createMusicStage(genre, x, z, createFloatingText); // Add the station first so matrix calculations work.
 
     musicWorldGroup.add(station.group); // Important fix:
-    // The old code added position.x and position.z again after localToWorld().
-    // localToWorld() already includes the Music World position.
-    // Adding position again moved the trigger far away from the 3D model.
+    // localToWorld() already accounts for the Music World position.
+    // Avoid adding position.x and position.z again or the trigger will be offset incorrectly.
 
     musicWorldGroup.updateMatrixWorld(true);
     station.group.updateMatrixWorld(true);
@@ -326,15 +325,15 @@ function addTriggerVisual(group, color) {
 
 function addStageModel(group, genre) {
   var loader = new _GLTFLoader.GLTFLoader();
-  var stageHolder = new THREE.Group(); // I kept your current custom stage position.
+  var stageHolder = new THREE.Group(); // Preserve the existing custom stage position.
 
-  stageHolder.position.copy(STAGE_MODEL_POSITION); // I kept your current custom stage rotation.
+  stageHolder.position.copy(STAGE_MODEL_POSITION); // Preserve the existing custom stage rotation.
 
   stageHolder.rotation.y = STAGE_MODEL_ROTATION_Y;
   group.add(stageHolder);
   loader.load("models/small_stage.glb", function (gltf) {
     var stage = gltf.scene;
-    centerModel(stage); // I kept your current custom stage scale.
+    centerModel(stage); // Preserve the existing custom stage scale.
 
     stage.scale.copy(STAGE_MODEL_SCALE);
     stage.traverse(function (child) {

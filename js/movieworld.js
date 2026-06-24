@@ -45,7 +45,7 @@ const MOVIE_SEAT_MODEL_ROTATION_Y = Math.PI;
 
 const MOVIE_YOUTUBE_SCREEN_POSITION = new THREE.Vector3(-9, 2, -55.45);
 
-// Bigger / smaller YouTube screen.
+// Adjust these values to scale the YouTube screen.
 const MOVIE_YOUTUBE_SCREEN_WIDTH = 26.4;
 const MOVIE_YOUTUBE_SCREEN_HEIGHT = 13.5;
 
@@ -225,7 +225,7 @@ export function createMovieWorld(scene, cssScene, createFloatingText, position) 
   sign.position.set(-7, 9, 0);
   movieWorldGroup.add(sign);
 
-  // Popcorn machine in the middle of Movie World.
+  // Add the central popcorn machine to Movie World.
   addPopcornMachine(movieWorldGroup);
 
   const movieStations = [];
@@ -299,8 +299,8 @@ function createMovieTheater(genre, x, z, createFloatingText) {
   // 3D projector screen model for each genre.
   addProjectorModel(group, genre);
 
-  // Cinema seats in front of the projector screen.
-  // If the model is missing, it will use a simple backup seat.
+  // Cinema seats are placed in front of the projector screen.
+  // A backup seat is used if the model fails to load.
   addMovieSeatModel(group, genre);
 
   const sign = createFloatingText(genre.name, genre.color);

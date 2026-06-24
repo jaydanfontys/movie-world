@@ -6,7 +6,7 @@ import * as SkeletonUtils from "three/addons/utils/SkeletonUtils.js";
 // STAGE MODEL SETTINGS
 // ===============================
 
-// These control where the 3D stage model is placed inside each music station.
+// Defines the 3D stage placement within each music station.
 // x = left/right
 // y = up/down
 // z = forward/back
@@ -18,28 +18,28 @@ const STAGE_MODEL_SCALE = new THREE.Vector3(0.10, 0.07, 0.07);
 // TRIGGER / POPUP SETTINGS
 // ===============================
 
-// This is the invisible point the car checks to open the music popup.
-// I placed it close to the 3D stage model.
+// Invisible trigger point used for opening the music popup.
+// Positioned near the 3D stage model.
 const STAGE_TRIGGER_POSITION = new THREE.Vector3(3, 0, 46);
 
-// This visible circle helps you see where the popup should open.
-// You can make this smaller later, but for now it helps with testing.
+// Visible marker for the popup activation area.
+// This is useful for layout testing.
 const STAGE_TRIGGER_VISUAL_RADIUS = 7.5;
 
 // ===============================
 // DANCER SETTINGS
 // ===============================
 
-// Keep this low for performance.
+// Keep the dancer count low to preserve performance.
 // 2 dancers per stage = 12 dancers total.
 const DANCERS_PER_STAGE = 2;
 
-// Change this to make all dancers bigger or smaller.
+// Global scale factor for dancer models.
 const DANCER_SCALE = 0.02;
 
-// Turn this off if the website becomes slow.
-// true = dancers animate
-// false = dancers stay still
+// Disable animation if performance is an issue.
+// true = animated dancers
+// false = static dancers
 const ENABLE_DANCER_ANIMATION = false;
 
 // These are the dancing models in your models folder.
@@ -50,7 +50,7 @@ const DANCER_MODEL_PATHS = [
   "models/spider_man_dancing.glb"
 ];
 
-// These store loaded dancer models so we do not load the same file again and again.
+// Cache loaded dancer models to avoid repeated GLTF loads.
 const dancerModelCache = {};
 const dancerMixers = [];
 
@@ -60,11 +60,11 @@ const dancerMixers = [];
 
 const SPEAKER_MODEL_PATH = "models/doof_wagon_speakers.glb";
 
-// Change this if the speaker is too big/small.
+// Speaker model scale; adjust this if size is incorrect.
 // Try 0.05, 0.06, 0.08, or 0.1.
 const SPEAKER_MODEL_SCALE = new THREE.Vector3(0.06, 0.06, 0.06);
 
-// These are the speaker positions around each stage.
+// Speaker positions around each stage.
 // x = left/right
 // y = up/down
 // z = forward/back
@@ -104,12 +104,12 @@ export function updateMusicStageAudio(genre) {
 }
 
 export function clearMusicStageAudio() {
-  // No local mp3 audio to stop.
-  // The popup iframe is cleared inside three.js when the panel closes.
+  // No local MP3 playback is active for the music stage.
+  // The popup iframe cleanup is handled by three.js when the panel closes.
 }
 
-// This must be called in the main animation loop in three.js.
-// It updates all dancer animations.
+// Called from the main three.js animation loop.
+// Updates dancer animation mixers.
 export function updateMusicDancers(deltaTime) {
   if (!ENABLE_DANCER_ANIMATION) return;
 
@@ -285,9 +285,8 @@ export function createMusicWorld(scene, createFloatingText, position) {
     musicWorldGroup.add(station.group);
 
     // Important fix:
-    // The old code added position.x and position.z again after localToWorld().
-    // localToWorld() already includes the Music World position.
-    // Adding position again moved the trigger far away from the 3D model.
+    // localToWorld() already accounts for the Music World position.
+    // Avoid adding position.x and position.z again or the trigger will be offset incorrectly.
     musicWorldGroup.updateMatrixWorld(true);
     station.group.updateMatrixWorld(true);
 
@@ -425,10 +424,10 @@ function addStageModel(group, genre) {
 
   const stageHolder = new THREE.Group();
 
-  // I kept your current custom stage position.
+  // Preserve the existing custom stage position.
   stageHolder.position.copy(STAGE_MODEL_POSITION);
 
-  // I kept your current custom stage rotation.
+  // Preserve the existing custom stage rotation.
   stageHolder.rotation.y = STAGE_MODEL_ROTATION_Y;
 
   group.add(stageHolder);
@@ -441,7 +440,7 @@ function addStageModel(group, genre) {
 
       centerModel(stage);
 
-      // I kept your current custom stage scale.
+      // Preserve the existing custom stage scale.
       stage.scale.copy(STAGE_MODEL_SCALE);
 
       stage.traverse((child) => {
